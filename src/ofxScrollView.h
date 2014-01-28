@@ -18,15 +18,20 @@ typedef enum ScrollPhase {
 
 class    ofxScrollView
 {
+
+private:
     // BASE CLASS
-    
+
 protected:
     
     ofRectangle frame;
+    ofRectangle bounds;
     
-    int             verticalPadding;
-    int             horizontalPadding;
-    
+    int             _xRootOffset;
+    int             _yRootOffset;
+    int *           xTouchOffset;
+    int *           yTouchOffset;
+
     int             state;
     
     // Touch Handliing
@@ -51,18 +56,16 @@ protected:
     
     int scrollPosition = 0;
     
-    ScrollPhase scrollPhase;
+    ScrollPhase scrollPhase = ScrollPhaseNil;
     
     // RASTER
     
     ofFbo           raster;
-
-
     
-    ofxScrollView * _parent;
+    ofxScrollView * _parent = NULL;
     vector<ofxScrollView *> children;
     
-    bool            highlighted;
+    bool            highlighted = false;
     
 public:
     ofxScrollView();                           //constructor
@@ -77,16 +80,19 @@ public:
     
     void                    update();
     ofRectangle             getFrame();
+    void                    setFrame(ofRectangle nframe);
     
     void                    setHighlighted(bool setHighlighted);
     
     float                   outOfBounds();
     
-    void                    begin();
-    void                    end();
+    void                    begin(ofRectangle rect);
+    void                    end(ofRectangle rect);
     
     int                     getHeight();
     int                     getWidth();
+    
+    float                   getScreenScale();
     
     // METHODS TO OVERRIDE
     
@@ -111,18 +117,23 @@ public:
     
     // PUBLIC SCALAR PROPERTIES
     
-    string          displayName;
+    string          displayName = "null";
     
     int             referenceId = 0;
     int             displayId = 0;
     
-    
-    bool            hidden = true;
+    bool            hidden = false;
     bool            drawsBorder = true;
-    bool            drawsName = true;
+    bool            drawsName = false;
     bool            scrollDirectionVertical = true;
     bool            scrollingEnabled = false;
     bool            shouldRasterize = false;
+    bool            clipToBounds = true;
+    
+    bool            scrollShouldCull();
+    
+    int             verticalPadding;
+    int             horizontalPadding;
     
     void            setScrollPostion(int offset, bool animated);
     

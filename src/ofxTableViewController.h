@@ -5,7 +5,6 @@
 #include "ofMain.h"
 #include "ofxMultiTouch.h"
 
-
 class ofxTableView;
 
 

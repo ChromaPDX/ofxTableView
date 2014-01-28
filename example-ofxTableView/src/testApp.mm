@@ -13,10 +13,20 @@ public:
         
         ofPushMatrix();
         
+
+        
         ofTranslate(rect.x + rect.width/2., rect.y + rect.height/2.);
         
         ofRotate(xspin, 1, 0, 0);
+       
+        ofSetColorf(fgColor);
+        ofFill();
+        ofDrawCone(0,0, rect.height/2., rect.height);
         
+        float stroke[4] = {0,0,0,.8};
+        
+        ofSetColorf(stroke);
+        ofNoFill();
         ofDrawCone(0,0, rect.height/2., rect.height);
         
         ofPopMatrix();
@@ -41,41 +51,52 @@ float spin;
 //--------------------------------------------------------------
 void testApp::setup(){	
 
+
+    
     
     vc = new ofxTableViewController;
     
     tbv = vc->addTableView(0,0,ofGetWidth(),ofGetHeight());
     
-    tbv->setFgColor(ofColor(0,100,10,255));
+    //tbv->setFgColor(ofColor(0,100,10,255));
     tbv->setBgColor(ofColor(0,100,200,100));
+    
+    ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
+
+    ofxTableViewCell *header = scroller->addCell(ofxTableViewCellStyleText, .5);
+    
+    header->setString("HELLO !");
+    
+    ofxTableViewCell *image = scroller->addCell(ofxTableViewCellStylePicture, .5);
+    
+    image->setImageFromDisk("Icon@2x.png");
+
     
     for (int i = 0; i < 10; i++){
         
-        tbv->addCell(ofxTableViewCellStyleText, .125);
+        float scale = random() %2 + 1;
         
-        ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
-        
-        for (int i = 0; i < random()%20 + 1; i++) {
-            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25);
-            
-            picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
-            
-            
+        if (scale > 1){
+        ofxTableViewCell *text = tbv->addCell(ofxTableViewCellStyleText, .125);
+        text->setString("OFX TABLE VIEW !!!");
         }
         
-        myCustomCell *newCell = new myCustomCell;
-        
-        newCell->initWithParent(scroller, ofxTableViewCellStyleCustom, .5);
-        
-        newCell->setBgColor(ofColor(0,0,0,255));
-        
-        scroller->addChild(newCell);
-        
+        ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25 * scale);
         
         for (int i = 0; i < random()%20 + 1; i++) {
-            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25);
+            
+            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25 * scale);
             
             picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
+            
+            picture->setImageFromDisk("Icon@2x.png");
+            
+            myCustomCell *newCell = new myCustomCell;
+            
+            
+            scroller->addCustomCell(newCell, .33);
+            
+            newCell->drawsBorder = false;
             
             
         }

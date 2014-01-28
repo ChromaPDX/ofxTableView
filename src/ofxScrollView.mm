@@ -1,4 +1,8 @@
 #include "ofxScrollView.h"
+
+#include "ofxiOS.h"
+#include "ofxiOSExtras.h"
+
 #include <Foundation/Foundation.h>
 
 ofxScrollView:: ofxScrollView()//constructor
@@ -11,8 +15,18 @@ ofxScrollView::~ ofxScrollView()//destructor
     
 }
 
+float ofxScrollView::getScreenScale(){
+    
+    if (((ofAppiOSWindow*)ofGetWindowPtr())->isRetinaEnabled()){
+        return 2.0f;
+    }
+    return 1.0f;
+}
 
 void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
+    
+    bounds = ofRectangle(0,0,nframe.width,nframe.height);
+    frame = ofRectangle(nframe);
     
     if (parent){
         
@@ -28,6 +42,10 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
         
         parent->cdirty = true;
         
+        xTouchOffset = parent->xTouchOffset;
+        yTouchOffset = parent->yTouchOffset;
+        
+        
     }
     
     else {
@@ -35,15 +53,22 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
         localTint = 1.;
         sharedTint = &localTint;
         
-        if (!localFont.loadFont(DEFAULT_FONT_STRING, DEFAULT_FONT_SIZE)){
+        if (!localFont.loadFont(DEFAULT_FONT_STRING, DEFAULT_FONT_SIZE * getScreenScale())){
             
         }
+        
         sharedFont = &localFont;
         
+        setFgColor(ofColor(255));
+        
+        _xRootOffset = nframe.x;
+        _yRootOffset = nframe.y;
+        
+        xTouchOffset = &_xRootOffset;
+        yTouchOffset = &_yRootOffset;
         
     }
     
-    frame = ofRectangle(nframe);
     hidden = false;
     restitution = 3;
     drag = 1.5;
@@ -72,7 +97,7 @@ float ofxScrollView::outOfBounds(){
         }
         
         else {
-
+            
             if (getContentSize() > frame.height) {
                 
                 int diff = scrollPosition + getContentSize() - frame.height;
@@ -127,100 +152,119 @@ float ofxScrollView::outOfBounds(){
     
 }
 
+bool ofxScrollView::scrollShouldCull() {
+    
+    if (_parent){
+        
+        if (_parent->scrollingEnabled) {
+            
+            if (_parent->scrollDirectionVertical && (frame.y + frame.height < _parent->getFrame().y || frame.y > _parent->getFrame().y + _parent->getHeight())) {
+                return true;
+            }
+            
+            else if (frame.x + frame.width < _parent->getFrame().x || frame.x > _parent->getFrame().x + _parent->getWidth()) {
+                return true;
+            }
+            
+//            else if (_parent->hidden == false) {
+//                hidden = false;
+//            }
+//            
+        }
+        
+    }
+    
+    return false;
+}
+
 void ofxScrollView::update() {
     
-    if (frame.y + frame.height < 0 || frame.y > ofGetHeight()) {
-        hidden = true;
-    }
-    else {
+    if  (scrollingEnabled){
         
-        if  (scrollingEnabled){
+        
+        if (scrollPhase != ScrollPhaseNil) {
             
-            
-            if (scrollPhase != ScrollPhaseNil) {
-                
-                if (fabsf(scrollVel) > restitution){
-                    scrollVel = scrollVel / drag;
-                }
-                
-                else {
-                    scrollVel = 0;
-                }
-                
-                
-                if (fabsf(counterVel) > restitution){
-                    counterVel = counterVel / drag;
-                }
-                
-                else {
-                    counterVel = 0;
-                }
-                
+            if (fabsf(scrollVel) > restitution){
+                scrollVel = scrollVel / drag;
             }
             
-            if (scrollPhase == ScrollPhaseEnded) {
-                
-                drag = 1.04;
-                
-                if (scrollVel != 0 && !outOfBounds()) {
-                    setScrollPostion(scrollPosition + scrollVel, false);
-                }
-                
-                else {
-                    scrollPhase = ScrollPhaseRestitution;
-                    easeIn = 20;
-                    easeOut = false;
-                    NSLog(@"start restitution");
-                }
-                
-            }
-            
-            if (scrollPhase == ScrollPhaseRestitution) {
-                
+            else {
                 scrollVel = 0;
-                
-                if (!easeOut) {
-                    if (easeIn > 5) easeIn--;
-                    else easeOut = true;
-                }
-                else {
-                    if (easeIn < 20) easeIn++;
-                }
-                
-                float dir = outOfBounds();
-                
-                if (dir != 0) {
-                    setScrollPostion(scrollPosition - dir / easeIn, false);
-                }
-                
-                else {
-                    NSLog(@"scroll stopped");
-                    scrollPhase = ScrollPhaseNil;
-                }
-                
+            }
+            
+            
+            if (fabsf(counterVel) > restitution){
+                counterVel = counterVel / drag;
+            }
+            
+            else {
+                counterVel = 0;
             }
             
         }
         
-        hidden = false;
+        if (scrollPhase == ScrollPhaseEnded) {
+            
+            drag = 1.04;
+            
+            if (scrollVel != 0 && !outOfBounds()) {
+                setScrollPostion(scrollPosition + scrollVel, false);
+            }
+            
+            else {
+                scrollPhase = ScrollPhaseRestitution;
+                easeIn = 20;
+                easeOut = false;
+                //NSLog(@"start restitution");
+            }
+            
+        }
         
-        for(int i = 0; i < children.size(); i++)
-        {
-            children[i]->update();
+        if (scrollPhase == ScrollPhaseRestitution) {
+            
+            scrollVel = 0;
+            
+            if (!easeOut) {
+                if (easeIn > 5) easeIn--;
+                else easeOut = true;
+            }
+            else {
+                if (easeIn < 20) easeIn++;
+            }
+            
+            float dir = outOfBounds();
+            
+            if (dir != 0) {
+                setScrollPostion(scrollPosition - dir / easeIn, false);
+            }
+            
+            else {
+                //NSLog(@"scroll stopped");
+                scrollPhase = ScrollPhaseNil;
+            }
+            
         }
         
     }
     
-
+    
+    for(int i = 0; i < children.size(); i++)
+    {
+        children[i]->update();
+    }
+    
+    
+    
+    
 }
 
 
 void ofxScrollView::setScrollPostion(int offset, bool animated){
     
-        if (scrollPosition != offset) {
-            scrollPosition = offset;
-            fdirty = true;
-        }
+    if (scrollPosition != offset) {
+        scrollPosition = offset;
+        fdirty = true;
+    }
     
 }
 
@@ -235,26 +279,26 @@ int  ofxScrollView::getWidth() {
 int ofxScrollView::getContentSize(){
     
     if (cdirty) {
-
-    int tempSize = 0;
-    
-    for(int i = 0; i < children.size(); i++)
-    {
-        if (scrollDirectionVertical) {
-            int temp = children[i]->getHeight();
-            tempSize += temp + verticalPadding;
-        }
-        else {
-            int temp = children[i]->getWidth();
-            tempSize += temp + horizontalPadding;
-        }
-
-    }
-    
-    contentSize = tempSize;
         
-    return tempSize;
-    
+        int tempSize = 0;
+        
+        for(int i = 0; i < children.size(); i++)
+        {
+            if (scrollDirectionVertical) {
+                int temp = children[i]->getHeight();
+                tempSize += temp + verticalPadding;
+            }
+            else {
+                int temp = children[i]->getWidth();
+                tempSize += temp + horizontalPadding;
+            }
+            
+        }
+        
+        contentSize = tempSize;
+        
+        return tempSize;
+        
     }
     
     else {
@@ -286,6 +330,7 @@ ofRectangle  ofxScrollView::getChildRect(ofxScrollView *v){
                                    frame.height * v->heightPct
                                    );
             
+            v->hidden = v->scrollShouldCull();
             
             return v->frame;
             
@@ -305,6 +350,9 @@ ofRectangle  ofxScrollView::getChildRect(ofxScrollView *v){
                                    frame.y + (verticalPadding/2.),
                                    frame.width * v->widthPct,
                                    frame.height - verticalPadding);
+            
+            v->hidden = v->scrollShouldCull();
+            
             return v->frame;
             
         }
@@ -322,6 +370,11 @@ ofRectangle ofxScrollView::getFrame() {
     return frame;
 }
 
+void ofxScrollView::setFrame(ofRectangle nframe){
+    frame = nframe;
+    fdirty = true;
+}
+
 ofRectangle ofxScrollView::getParentRect(){
     
     return ofRectangle(_parent->getFrame());
@@ -336,11 +389,19 @@ void ofxScrollView::scaleFrame(float scale){
         cdirty = true;
         
         float dScale = (scale - _scale);
+        
         float rScale = 1 + dScale;
         
-        frame = ofRectangle(frame.x * rScale, frame.y * rScale, frame.width * rScale, frame.height * rScale);
+        bounds = ofRectangle(0,0,bounds.width * rScale,bounds.height * rScale);
+        
+        setFrame(ofRectangle(frame.x, frame.y, bounds.width, bounds.height));
+        
+        _xRootOffset = frame.x;
+        _yRootOffset = frame.y;
         
         _scale += dScale;
+        
+        raster.allocate(bounds.width, bounds.height);
         
         NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
         
@@ -349,13 +410,26 @@ void ofxScrollView::scaleFrame(float scale){
 }
 
 void ofxScrollView::setHighlighted(bool setHighlighted) {
-    highlighted = setHighlighted;
+    
+    if (scrollingEnabled) {
+        if (!setHighlighted) {
+            for (int i = 0; i < children.size(); i++ )
+            {
+                children[i]->setHighlighted(false);
+            }
+        }
+    }
+    
+    else {
+        highlighted = setHighlighted;
+    }
+    
 }
 
-void ofxScrollView::begin() {
+void ofxScrollView::begin(ofRectangle rect) {
     
     if (!_parent) {
-        ofEnableAlphaBlending();
+        //  ofEnableAlphaBlending();
     }
     
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
@@ -364,28 +438,38 @@ void ofxScrollView::begin() {
         if (shouldRasterize){
             
             if (!raster.isAllocated()) {
-                raster.allocate(frame.width, frame.height);
+                raster.allocate(rect.width, rect.height);
             }
             raster.begin();
             
         }
         
         if (bgImage.isAllocated()) {
-            bgImage.draw(frame);
+            bgImage.draw(rect);
+            
+//            if (highlighted) {
+//                ofFill();
+//                ofSetColor(255,255,255,50);
+//                ofRect(rect);
+//            }
         }
         
         else if (bgColor[3] != 0){
-            
+
             ofFill();
+            
+//            if (highlighted) {
+//                float tempColor[4] = {bgColor[0]+.2, bgColor[1]+.2, bgColor[2]+.2, bgColor[3]+.2};
+//                ofSetColorf(tempColor);
+//            }
             ofSetColorf(bgColor);
-            ofRect(frame);
+            ofRect(rect);
             
         }
         
         if (drawsName) {
-            
-            sharedFont->drawString(displayName, frame.x + frame.width - sharedFont->stringWidth(displayName), frame.y + sharedFont->stringHeight(displayName));
-            
+            ofSetColorf(fgColor);
+            sharedFont->drawString(displayName, rect.x + rect.width - sharedFont->stringWidth(displayName), rect.y + sharedFont->stringHeight(displayName));
         }
         
         
@@ -394,7 +478,7 @@ void ofxScrollView::begin() {
     
 }
 
-void ofxScrollView::end() {
+void ofxScrollView::end(ofRectangle rect) {
     
     
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
@@ -402,18 +486,21 @@ void ofxScrollView::end() {
         
         for(int i = 0; i < children.size(); i++)
         {
+          
             children[i]->draw(getChildRect(children[i]));
+        
         }
         
         if (drawsBorder) {
             ofNoFill();
             
-            ofSetColor(255,255,255,200);
-            ofSetLineWidth(2);
+            ofSetColorf(fgColor);
+            ofSetLineWidth(2*getScreenScale());
             
-            ofRect(frame);
+            ofRect(rect);
         }
         
+
         if (shouldRasterize) {
             
             raster.end();
@@ -421,30 +508,47 @@ void ofxScrollView::end() {
             
         }
         
+        if (highlighted) {
+            ofEnableBlendMode(OF_BLENDMODE_ADD);
+            ofFill();
+            ofSetColor(255,255,255,100);
+            ofRect(rect);
+            ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        }
+        
         dirty = false;
         fdirty = false;
     }
-    
-    
     
 }
 
 void     ofxScrollView::draw(ofRectangle rect)
 {
-    begin();
-    // CUSTOM DRAW CODE
-    end();
     
+    /*
     // SUBCLASS LOOKS LIKE
-    // ofxScrollView::begin();
-    // custom code
-    // ofxScrollView::end();
+    
+    if (!hidden) {
+        
+        ofxScrollView::begin();
+        
+        // CUSTOM DRAW CODE
+        
+        ofxScrollView::end();
+        
+    }
+    */
+    
 }
 
 bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is within boundaries of object.
 {
+    
+    int lx = x - *xTouchOffset;
+    int ly = y - *yTouchOffset;
+    
     bool withinArea = false;
-    if ( x > frame.x && x < frame.x + frame.width && y > frame.y && y < frame.y + frame.height)
+    if ( lx > frame.x && lx < frame.x + frame.width && ly > frame.y && ly < frame.y + frame.height)
     {
         withinArea = true;
     }
@@ -477,12 +581,12 @@ void     ofxScrollView::touchDown(float x , float y, int touchId)
         {
             if ( children[i]->containsPoint(x,y) == true)
             {
-                children[i]->highlighted = true;
+                children[i]->setHighlighted(true);
                 children[i]->touchDown(x, y, touchId);
             }
             else
             {
-                children[i]->highlighted = false;
+                children[i]->setHighlighted(false);
             }
         }
     }
@@ -493,7 +597,7 @@ void     ofxScrollView::touchMoved(float x, float y, int touchId)
 {
     
     if  (scrollingEnabled) {
-
+        
         int sDt;
         int cDt;
         
@@ -516,12 +620,12 @@ void     ofxScrollView::touchMoved(float x, float y, int touchId)
             
             if (fabs(scrollVel) > fabs(counterVel) + (restitution * 2.)){
                 scrollPhase = ScrollPhaseRecognized;
-                NSLog(@"Scroll started %f, %f", scrollVel, counterVel);
+                //NSLog(@"Scroll started %f, %f", scrollVel, counterVel);
                 
             }
             
             else if (fabs(counterVel) > fabs(scrollVel) + (restitution)){
-                NSLog(@"FAILED %f, %f", counterVel, scrollVel);
+               // NSLog(@"FAILED %f, %f", counterVel, scrollVel);
                 scrollPhase = ScrollPhaseBeginFail;
             }
             
@@ -539,12 +643,12 @@ void     ofxScrollView::touchMoved(float x, float y, int touchId)
             {
                 if ( children[i]->containsPoint(x,y) == true)
                 {
-                    children[i]->highlighted = true;
+                    children[i]->setHighlighted(true);
                     children[i]->touchDown(x, y, touchId);
                 }
                 else
                 {
-                    children[i]->highlighted = false;
+                    children[i]->setHighlighted(false);
                 }
             }
             
@@ -584,25 +688,28 @@ void     ofxScrollView::touchUp(float x, float y, int touchId)
     
     if (scrollingEnabled) {
         
-        if (scrollPhase == ScrollPhaseFailed || scrollPhase == ScrollPhaseBegan) {
+        if (scrollPhase == ScrollPhaseFailed || scrollPhase == ScrollPhaseBegan || scrollPhase == ScrollPhaseNil) {
             
-//            if (scrollPhase == ScrollPhaseBegan) { // NEVER RECOGNIZED
-//                
-//                for (int i = 0; i < children.size(); i++ )
-//                {
-//                    if ( children[i]->containsPoint(x,y) == true)
-//                    {
-//                        children[i]->touchDown(x, y, touchId);
-//                    }
-//                }
-//            }
+            //            if (scrollPhase == ScrollPhaseBegan) { // NEVER RECOGNIZED
+            //
+            //                for (int i = 0; i < children.size(); i++ )
+            //                {
+            //                    if ( children[i]->containsPoint(x,y) == true)
+            //                    {
+            //                        children[i]->touchDown(x, y, touchId);
+            //                    }
+            //                }
+            //            }
             
             for (int i = 0; i < children.size(); i++ )
             {
                 
+                children[i]->setHighlighted(false);
+                
                 if ( children[i]->containsPoint(x,y) == true)
                 {
                     children[i]->touchUp(x, y, touchId);
+                    children[i]->setHighlighted(true);
                 }
                 
                 else if (children[i]->scrollPhase != ScrollPhaseNil) {
@@ -617,8 +724,8 @@ void     ofxScrollView::touchUp(float x, float y, int touchId)
         
         else {
             
-           
-           // NSLog(@"scroll ended on %s %f", displayName.c_str(), scrollVel);
+            
+            // NSLog(@"scroll ended on %s %f", displayName.c_str(), scrollVel);
             
             scrollPhase = ScrollPhaseEnded;
         }

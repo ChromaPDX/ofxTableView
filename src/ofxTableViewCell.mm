@@ -25,11 +25,11 @@ void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellSty
 
     scrollingEnabled = false;
     scrollDirectionVertical = false;
-    horizontalPadding = 20;
+    horizontalPadding = 5*getScreenScale();
     verticalPadding = 0;
     
     drawsBorder = true;
-    drawsName = true;
+    drawsName = false;
     
     initStyle(cellStyle);
                                   
@@ -48,7 +48,7 @@ void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCel
     verticalPadding = 0;
     
     drawsBorder = true;
-    drawsName = true;
+    drawsName = false;
     
     initStyle(cellStyle);
     
@@ -62,9 +62,24 @@ ofxTableViewCell*    ofxTableViewCell::addCell(ofxTableViewCellStyle ncellStyle,
     
     addChild(newCell);
     
+    addDataSourceForCell(newCell);
+    
     return newCell;
     
 }
+
+void ofxTableViewCell::addCustomCell(ofxTableViewCell* custom, float nWidthPct)
+{
+
+    custom->initWithParent(this, ofxTableViewCellStyleCustom, nWidthPct);
+    
+    addChild(custom);
+    
+    addDataSourceForCell(custom);
+
+    
+}
+
 
 void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
 {
@@ -83,6 +98,7 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
     else if (style == ofxTableViewCellStylePicture){
         
         displayName = "Picture Cell";
+        drawsBorder = false;
         
     }
     
@@ -119,26 +135,143 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
 
 }
 
+ofRectangle  ofxTableViewCell::getChildRect(ofxScrollView *v){
+    
+    if (fdirty) {
+
+        //   NSLog(@"rasterizing!!");
+        if (cellStyle == ofxTableViewCellStyleRadialPicker){
+            return v->getFrame();
+        }
+        
+        else return ofxScrollView::getChildRect(v);
+        
+    }
+    
+    else {
+        return v->getFrame();
+    }
+    
+}
+
+void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
+  
+    UniversalContainer dictionary = *dataSource;
+    
+    if (cell->cellStyle == ofxTableViewCellStyleText) {
+        
+        dictionary[cell->referenceId]["text"] = "default";
+        
+        cell->dataSource = &dictionary[cell->referenceId]["text"];
+        
+    }
+    
+    else if (cell->cellStyle == ofxTableViewCellStyleGraph) {
+        
+        dictionary[cell->referenceId]["array"].init_array();
+        
+        cell->dataSource = &dictionary[cell->referenceId]["array"];
+        
+    }
+    
+    else if (cell->cellStyle == ofxTableViewCellStyleScroll) {
+        
+        NSLog(@"no duplicate nesting of scrollers!!!!");
+        
+    }
+    
+    else {
+        
+        dictionary[cell->referenceId]["text"] = "default";
+        
+        cell->dataSource = &dictionary[cell->referenceId]["text"];
+
+    }
+    
+}
+
 
 void    ofxTableViewCell::draw(ofRectangle rect)
 {
-
-    if  (!hidden){
+    
+    if (!hidden) {
         
-        ofxScrollView::draw(rect);
+        ofxScrollView::begin(rect);
+        
+        if (cellStyle == ofxTableViewCellStyleText) {
+            
+            ofSetColorf(fgColor);
+            
+            sharedFont->drawString((string)*dataSource, rect.x + rect.width/2. - (sharedFont->stringWidth((string)*dataSource)/2.), rect.y + rect.height/2. + (sharedFont->stringHeight((string)*dataSource)/2.));
+            
+        }
+        
+        else if (cellStyle == ofxTableViewCellStyleGraph){
+            
+            if (dataSource) {
+
+                if (dataSource->get_type() == uc_Array){
+                    
+                    ofFill();
+                    ofSetColorf(fgColor);
+                    ofPath path;
+                    
+                    path.moveTo(0, rect.height);
+                    
+                    int max = 0;
+                    for(int i = 0; i < dataSource->size(); i++){
+                        if (max < (int)(*dataSource)[i]) max = (*dataSource)[i];
+                    }
+                    float yscale = (float)rect.height / max;
+                    float xscale = (rect.width/dataSource->size());
+                    
+                    for(int i = 0; i < dataSource->size(); i++){
+                        
+                        path.lineTo(i*xscale, (int)(*dataSource)[i] * yscale);
+                        
+                    }
+                    
+                    path.lineTo(rect.width, rect.height);
+
+                    
+                    path.draw(rect.x, rect.y);
+
+                }
+
+                
+            }
+
+        }
+        
+        else if (cellStyle == ofxTableViewCellStylePicture) {
+            
+            ofSetColorf(fgColor);
+            
+            if (!_image.isAllocated() && dataSource && dataSource->length() != 0) {
+                _image.loadImage(*dataSource);
+            }
+
+
+            float scale = MIN(rect.height / _image.height, rect.width / _image.width);
+            _image.draw(rect.x + ((rect.width - _image.width*scale) / 2.),rect.y+((rect.height - _image.height*scale) / 2.),_image.width*scale, _image.height*scale);
+
+            
+        }
+        
+        else if (cellStyle == ofxTableViewCellStyleSlider) {
+            drawSlider(rect);
+        }
         
         if (customDrawFunction) {
             customDrawFunction(rect, customDrawData);
         }
         
+        
+        ofxScrollView::end(rect);
+        
     }
     
-//    if (cellStyle == ofxTableViewCellStyleSlider) {
-//        drawSlider(rect);
-//    }
-    
 }
-
 
 void ofxTableViewCell::drawSlider(ofRectangle rect){
     
@@ -154,6 +287,57 @@ void ofxTableViewCell::drawSlider(ofRectangle rect){
 //    else ofSetColor(parent->fgColor);
 
     ofRect(rect.x, rect.y, slideWidth, rect.height);
+    
+}
+
+void ofxTableViewCell::setString(string s){
+    
+    if (dataSource->get_type() == uc_String || dataSource->get_type() == uc_Null) {
+        
+    *dataSource = s;
+    
+    NSLog(@"set string %s for cell %d " , ((string)*dataSource).c_str(), referenceId);
+        
+    }
+    
+    else NSLog(@"UC _ SET _ TYPE _ CONFLICT : EXPECTED STRING");
+    
+}
+
+
+void ofxTableViewCell::setImage(ofImage image){
+    _image = image;
+}
+
+void ofxTableViewCell::setImageFromDisk(string filename){
+    
+    if (dataSource->get_type() == uc_String || dataSource->get_type() == uc_Null) {
+        
+        *dataSource = filename;
+        
+        NSLog(@"set image %s for cell %d " , ((string)*dataSource).c_str(), referenceId);
+        
+        
+    }
+    
+    else NSLog(@"UC _ SET _ TYPE _ CONFLICT : EXPECTED STRING");
+    
+}
+
+
+
+void ofxTableViewCell::setArray(vector<int> array){
+    
+    if (dataSource->get_type() == uc_Array || dataSource->get_type() == uc_Null) {
+        
+        for (int i = 0; i < array.size(); i++) {
+            (*dataSource)[i] = (array)[i];
+        }
+        NSLog(@"set array sized: %lu for cell %d",dataSource->get_vector()->size(), referenceId);
+    }
+    
+    else NSLog(@"UC _ SET _ TYPE _ CONFLICT : EXPECTED ARRAY");
+    
     
 }
 
