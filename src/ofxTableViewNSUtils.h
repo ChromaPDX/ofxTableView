@@ -2,7 +2,7 @@
 //  ofxTableViewNSUtils.h
 //  ChromaNSFW
 //
-//  Created by Chroma Developer on 1/27/14.
+//  Created by Leif Shackelford on 1/27/14.
 //  Copyright (c) 2014 Chroma. All rights reserved.
 //
 
