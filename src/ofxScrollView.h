@@ -46,6 +46,39 @@ typedef enum ScrollPhase {
     ScrollPhaseRestitution
 } ScrollPhase;
 
+typedef enum TransitionStyle {
+    TransitionStyleNone,
+    TransitionStyleEnterFromRight,
+    TransitionStyleEnterFromLeft,
+    TransitionStyleExitToLeft,
+    TransitionStyleExitToRight,
+    TransitionStyleFade
+} TransitionStyle;
+
+
+class    ofxScrollViewAnimation
+{
+    
+public:
+    
+    int scrollPosition;
+    
+    bool completed;
+    
+    long long startTime;
+    long long duration;
+    
+    float completion;
+    float srcAlpha;
+    float dstAlpha;
+    
+    ofRectangle sourceFrame;
+    ofRectangle destFrame;
+    
+    TransitionStyle style;
+    
+};
+
 class    ofxScrollView
 {
 
@@ -56,6 +89,7 @@ protected:
     
     ofRectangle frame;
     ofRectangle bounds;
+    float alpha;
     
     int             _xRootOffset;
     int             _yRootOffset;
@@ -95,6 +129,10 @@ protected:
     ofxScrollView * _parent = NULL;
     vector<ofxScrollView *> children;
     
+
+    
+    vector<ofxScrollViewAnimation *> animations;
+
     bool            highlighted = false;
     
 public:
@@ -104,6 +142,7 @@ public:
     //METHODS:--------------------------------------------------------
     
     // METHODS TO BE CALLED BY SUBCLASSES
+    
     
     void                    initWithParent(ofxScrollView *parent, ofRectangle frame);
     void                    addChild(ofxScrollView *child);
@@ -124,6 +163,16 @@ public:
     
     float                   getScreenScale();
     
+    void                    pushModalView(ofxScrollView *child, TransitionStyle transitionStyle, float durationSec);
+    void                    popModalView(TransitionStyle transitionStyle,float durationSec);
+    void                    updateAnimation(ofxScrollViewAnimation *anim);
+    
+    ofxScrollView*          getParent();
+    ofxScrollView*          getRoot();
+    
+    ofxScrollView * _modalParent = NULL;
+    ofxScrollView * _modalChild = NULL;
+    
     // METHODS TO OVERRIDE
     
     virtual void            draw(ofRectangle rect);
@@ -135,11 +184,10 @@ public:
     
     virtual int             getContentSize();
     
-    virtual void            touchDown(float x, float y, int touchId);
-    virtual void            touchMoved(float x, float y, int touchId);
-    virtual void            touchUp(float x, float y, int touchId);
-    virtual void            touchDoubleTap(float x, float y, int touchId);
-    
+    virtual bool            touchDown(float x, float y, int touchId);
+    virtual bool            touchMoved(float x, float y, int touchId);
+    virtual bool            touchUp(float x, float y, int touchId);
+    virtual bool            touchDoubleTap(float x, float y, int touchId);
     
     
     void scaleFrame(float scale);
@@ -158,7 +206,7 @@ public:
     bool            scrollDirectionVertical = true;
     bool            scrollingEnabled = false;
     bool            shouldRasterize = false;
-    bool            clipToBounds = true;
+    bool            clipToBounds = false;
     
     bool            scrollShouldCull();
     

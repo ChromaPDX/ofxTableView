@@ -23,6 +23,9 @@ void ofxTableView::initWithParent(ofxScrollView *nparent, ofRectangle frame) {
     ofxScrollView::initWithParent(nparent, frame);
 
     dictionary.init_array();
+
+
+    displayName = "TABLE VIEW";
     
     hidden = false;
     drawsBorder = true;
@@ -74,13 +77,22 @@ ofRectangle  ofxTableView::getChildRect(ofxScrollView *v){
                 tempSize += temp + verticalPadding;
             }
             
-            
+        
+        if (clipToBounds){
             v->setFrame(ofRectangle((horizontalPadding / 2.),
-                                   tempSize + scrollPosition,
-                                   bounds.width-(horizontalPadding),
-                                   bounds.height * v->heightPct
+                                    tempSize + scrollPosition,
+                                    bounds.width-(horizontalPadding),
+                                    bounds.height * v->heightPct
                                     ));
             
+        }
+        else {
+            v->setFrame(ofRectangle(frame.x+(horizontalPadding / 2.),
+                                    frame.y+tempSize + scrollPosition,
+                                    bounds.width-(horizontalPadding),
+                                    bounds.height * v->heightPct
+                                    ));
+        }
             v->hidden = v->scrollShouldCull();
             
           
@@ -134,7 +146,7 @@ void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
 
 void ofxTableView::draw(){
     
-  
+    
     if (!raster.isAllocated()) {
         raster.allocate(bounds.width, bounds.height);
     }
@@ -147,15 +159,13 @@ void ofxTableView::draw(){
         
         ofClear(0,0,0,255);
         
-        if (!hidden) {
-            
-            ofxScrollView::begin(bounds);
-            
-            // CUSTOM DRAW CODE
-            
-            ofxScrollView::end(bounds);
-            
-        }
+        
+        ofxScrollView::begin(bounds);
+        
+        // CUSTOM DRAW CODE
+        
+        ofxScrollView::end(bounds);
+        
         
         raster.end();
         
@@ -165,15 +175,13 @@ void ofxTableView::draw(){
     
     else {
         
-        if (!hidden) {
             
-            ofxScrollView::begin(bounds);
+            ofxScrollView::begin(frame);
             
             // CUSTOM DRAW CODE
             
-            ofxScrollView::end(bounds);
+            ofxScrollView::end(frame);
             
-        }
         
     }
     

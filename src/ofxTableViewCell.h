@@ -44,6 +44,7 @@ typedef enum ofxTableViewCellStyle {
     ofxTableViewCellStyleText,
     ofxTableViewCellStylePicture,
     ofxTableViewCellStyleSlider,
+    ofxTableViewCellStyleModal,
     ofxTableViewCellStyleRadio,
     ofxTableViewCellStyleScroll,
     ofxTableViewCellStyleRadialPicker,
@@ -58,6 +59,7 @@ class   ofxTableViewCell : public ofxScrollView
     
 protected:
         ofImage         _image;
+        int indexPath[2];
     
 public:
     ofxTableViewCell();                           //constructor
@@ -92,6 +94,11 @@ public:
     
     void setImage(ofImage image);
     
+    void setModalTable(ofxScrollView *modal);
+    
+    int* getIndexPath();
+    
+    
     // CONFIGURABLE PROPERTIES
     
 
@@ -111,6 +118,12 @@ public:
     void (*customDrawFunction)(ofRectangle rect, void* customDrawData) = NULL;
     
     void *customDrawData = NULL;
+    
+    bool            touchDown(float x, float y, int touchId);
+    bool            touchMoved(float x, float y, int touchId);
+    bool            touchUp(float x, float y, int touchId);
+    bool            touchDoubleTap(float x, float y, int touchId);
+    
 };
 
 
