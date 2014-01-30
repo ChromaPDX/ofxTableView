@@ -122,6 +122,16 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
         
     }
     
+    else if (style == ofxTableViewCellStyleModal){
+        
+        displayName = "Nested Table";
+        
+        scrollDirectionVertical = false;
+        scrollingEnabled = false;
+        
+        
+    }
+    
     else if (style == ofxTableViewCellStyleCustom){
         displayName = "Custom Cell";
         
@@ -144,6 +154,11 @@ ofRectangle  ofxTableViewCell::getChildRect(ofxScrollView *v){
             return v->getFrame();
         }
         
+//        else if (getRoot()->_modalChild && cellStyle == ofxTableViewCellStyleModal) {
+//            return v->getFrame();
+//        }
+//
+//        
         else return ofxScrollView::getChildRect(v);
         
     }
@@ -162,7 +177,7 @@ void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
         
         dictionary[cell->referenceId]["text"] = "default";
         
-        cell->dataSource = &dictionary[cell->referenceId]["text"];
+        cell->dataSource = &dictionary[cell->referenceId];
         
     }
     
@@ -186,6 +201,25 @@ void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
         
         cell->dataSource = &dictionary[cell->referenceId]["text"];
 
+    }
+    
+}
+
+int* ofxTableViewCell::getIndexPath(){
+    
+    if (getParent() == getRoot()) {
+        
+        indexPath[0] = referenceId;
+        indexPath[1] = 0;
+        
+        return indexPath;
+    }
+    
+    else {
+        indexPath[0] = _parent->referenceId;
+        indexPath[1] = referenceId;
+        
+        return indexPath;
     }
     
 }
@@ -341,6 +375,59 @@ void ofxTableViewCell::setArray(vector<int> array){
     
 }
 
+void ofxTableViewCell::setModalTable(ofxScrollView *modal){
+    
+    *dataSource = (void*)modal;
+    NSLog(@"set nested table called: %s for cell %d",((ofxTableView*)dataSource)->displayName.c_str(), referenceId);
+    
+}
 
+bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
+    
+    if (  ofxScrollView::touchUp(x, y, touchId) ){
+        
+        if (((ofxTableView*)getRoot())->delegate) {
+            ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
+        }
+        
+        if (cellStyle == ofxTableViewCellStyleModal) {
+            if (children.size()) {
+                NSLog(@"presenting modal table");
+                ((ofxTableView*)getRoot())->pushModalView(children[0], TransitionStyleExitToLeft, .33);
+            }
+            else {
+                getRoot()->_modalParent->popModalView(TransitionStyleEnterFromLeft, .33);
+            }
+        }
+        
+        return true;
+        
+    }
+    
+    return false;
+    
+   
+
+}
+
+bool     ofxTableViewCell::touchDown(float x, float y, int touchId){
+    
+    return ofxScrollView::touchDown(x, y, touchId);
+
+    
+}
+
+bool     ofxTableViewCell::touchMoved(float x, float y, int touchId){
+    
+    return ofxScrollView::touchMoved(x, y, touchId);
+    
+}
+
+bool     ofxTableViewCell::touchDoubleTap(float x, float y, int touchId){
+    
+    return ofxScrollView::touchDoubleTap(x, y, touchId);
+    
+    
+}
 
 

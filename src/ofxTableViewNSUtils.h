@@ -11,13 +11,13 @@
 
 #pragma mark - UTILITY
 
-static string cppString(NSString *s){
+inline string cppString(NSString *s){
     
     return string([s cStringUsingEncoding:NSUTF8StringEncoding]);
     
 }
 
-static ofImage imgFromUIImage(UIImage* img) {
+inline ofImage imgFromUIImage(UIImage* img) {
     
     CFDataRef pixelData = CGDataProviderCopyData(CGImageGetDataProvider(img.CGImage));
     
@@ -31,7 +31,6 @@ static ofImage imgFromUIImage(UIImage* img) {
     ofImg.setFromPixels(buffer, img.size.width, img.size.height, OF_IMAGE_COLOR_ALPHA,true);
     
     return ofImg;
-    
     
 }
 

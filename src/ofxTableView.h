@@ -32,6 +32,8 @@
 #define ofxTableView_H_INCLUDED
 
 
+
+
 #include "ofxScrollView.h"
 
 #include "ofxTableViewNSUtils.h"
@@ -41,6 +43,20 @@
 
 class ofxTableViewCell;
 
+class ofxTableViewDelegate {
+    
+public:
+    
+	virtual ~ofxTableViewDelegate() {}
+    
+	virtual void cellWasSelected(ofxTableViewCell* cell) {}
+    
+    virtual void cellChangedValue(ofxTableViewCell* cell) {}
+    
+    virtual void cellWasDeSelected(ofxTableViewCell* cell) {}
+    
+};
+
 class   ofxTableView : public ofxScrollView
 {
 
@@ -48,6 +64,8 @@ public:
     
     ofxTableView();                           //constructor
     ~ofxTableView();                          //destructor
+    
+    ofxTableViewDelegate *delegate = NULL;
     
     ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nheightPct);
     

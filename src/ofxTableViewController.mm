@@ -86,17 +86,11 @@ void  ofxTableViewController::touchMoved(float x, float y, int touchId){
             
             for (int i = 0; i <  tableViews.size(); i++ )
             {
-                if (  tableViews[i]->containsPoint(x,y) == true)
-                {
-                   // NSLog(@"touch moved! %f %f %d", x,y,touchId);
-                    
+
                     tableViews[i]->touchMoved(x,y,touchId);
                 }
-                else
-                {
-                    
-                }
-            }
+
+            
         }
     }
 }
@@ -110,12 +104,10 @@ void     ofxTableViewController::touchDown(float x, float y, int touchId){
             
             for (int i = 0; i <  tableViews.size(); i++ )
             {
-                if (  tableViews[i]->containsPoint(x,y) == true)
-                {
-                    
-                    tableViews[i]->touchDown(x,y,touchId);
-                }
                 
+ 
+                    tableViews[i]->touchDown(x,y,touchId);
+      
                 
             }//end panel size.
         }
