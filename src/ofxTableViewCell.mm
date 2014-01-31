@@ -370,25 +370,7 @@ bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
             if (children.size()) {
                 NSLog(@"presenting modal table");
                 ((ofxTableView*)getRoot())->pushModalView(children[0], transitionStyle, transitionTime);
-    if (  ofxScrollView::touchUp(x, y, touchId) ){
-        
-        
-        if (cellStyle == ofxTableViewCellStyleModal) {
-            if (!getRoot()->_modalChild){
-                if (children.size()) {
-                    NSLog(@"presenting modal table");
-                    ((ofxTableView*)getRoot())->pushModalView(children[0], TransitionStyleZoomIn, 1.5);
-                    
-       
-                    
-                }
             }
-            
-            if (getRoot()->_modalParent) {
-            
-                getRoot()->_modalParent->popModalView(TransitionStyleZoomOut, 1.5);
-            }
-            
         }
         
         if (getRoot()->_modalParent) {

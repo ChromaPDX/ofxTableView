@@ -9,13 +9,11 @@ public:
     
     void draw(ofRectangle rect){
         
-        ofxScrollView::draw(rect);
-        
-        ofPushMatrix();
+        ofxScrollView::begin();
         
 
         
-        ofTranslate(rect.x + rect.width/2., rect.y + rect.height/2.);
+        ofPushMatrix();
         
         ofRotate(xspin, 1, 0, 0);
        
@@ -30,6 +28,10 @@ public:
         ofDrawCone(0,0, rect.height/2., rect.height);
         
         ofPopMatrix();
+        
+        
+        ofxScrollView::end();
+        
     }
     
     void update(){
@@ -57,7 +59,7 @@ void testApp::setup(){
     
     vc = new ofxTableViewController;
     
-    tbv = vc->addTableView(0,0,ofGetWidth(),ofGetHeight());
+    tbv = vc->addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
     
     //tbv->setFgColor(ofColor(0,100,10,255));
     tbv->setBgColor(ofColor(0,100,200,100));
