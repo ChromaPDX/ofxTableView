@@ -1,5 +1,4 @@
 #include "testApp.h"
-#include "ofxTableView.h"
 
 class myCustomCell : public ofxTableViewCell {
     
@@ -56,6 +55,8 @@ void testApp::setup(){
     
     tbv = vc->addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
     
+    tbv->delegate = this;
+    
     tbv->setFgColor(ofColor(255));
     tbv->setBgColor(ofColor(0,100,200,100));
     
@@ -104,6 +105,12 @@ void testApp::setup(){
         
     }
 
+    
+}
+
+void testApp::cellWasSelected(ofxTableViewCell *cell){
+    
+    ofLogNotice("tableView") << "selected section: " + ofToString(cell->getIndexPath()[0]) + " index: " + ofToString(cell->getIndexPath()[1]);
     
 }
 

@@ -252,8 +252,8 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
             childAnimation->sourceFrame = frame3d(child->getGlobalPosition(), child->bounds);
             
-            logFrame(frame3d(child->getFrame()));
-            logFrame(frame3d(child->getGlobalPosition(), child->bounds));
+           // logFrame(frame3d(child->getFrame()));
+           // logFrame(frame3d(child->getGlobalPosition(), child->bounds));
             
             _modalChild->cachedFrame = childAnimation->sourceFrame;
             

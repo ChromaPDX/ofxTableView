@@ -144,22 +144,6 @@ void ofxTableView::draw(){
     }
 
     
-
-
-    
-//    glDisable(GL_BLEND);
-//    glColorMask(0, 0, 0, 1);
-//    glColor4f(1,1,1,1.0f);
-//    
-//    ofRect(bounds);
-//    
-//    glColorMask(1,1,1,0);
-//    
-//    glEnable(GL_BLEND);
-//    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    
-    
-    
     
 }
 

@@ -386,7 +386,7 @@ bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
 
             if (((ofxTableView*)getRoot())->delegate) {
                 ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
-                logFrame(getGlobalFrame());
+               // logFrame(getGlobalFrame());
             }
             
         

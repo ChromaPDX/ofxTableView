@@ -3,8 +3,9 @@
 #include "ofMain.h"
 #include "ofxiOS.h"
 #include "ofxiOSExtras.h"
+#include "ofxTableView.h"
 
-class testApp : public ofxiOSApp{
+class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     
     public:
@@ -24,6 +25,11 @@ class testApp : public ofxiOSApp{
         void gotMemoryWarning();
         void deviceOrientationChanged(int newOrientation);
 
+    // TABLE VIEW DELEGATE
+    
+        void cellWasSelected(ofxTableViewCell *cell);
+    
+    
 };
 
 
