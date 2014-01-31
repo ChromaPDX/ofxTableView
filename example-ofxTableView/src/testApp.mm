@@ -1,5 +1,4 @@
 #include "testApp.h"
-#include "ofxTableView.h"
 
 class myCustomCell : public ofxTableViewCell {
     
@@ -7,19 +6,25 @@ public:
     
     float xspin = 0;
     
-    void draw(ofRectangle rect){
+    void draw(){
         
-        ofxScrollView::draw(rect);
+            ofxScrollView::begin();
+            
+            ofSetColorf(fgColor);
+            
+            ofFill();
+            ofDrawCone(0,0, getWidth()/2., getHeight());
+            
+            float stroke[4] = {0,0,0,.8};
+            
+            ofSetColorf(stroke);
+            ofNoFill();
+            
+            ofDrawCone(0,0, getWidth()/2., getHeight());
         
-        ofPushMatrix();
-        
-        ofTranslate(rect.x + rect.width/2., rect.y + rect.height/2.);
-        
-        ofRotate(xspin, 1, 0, 0);
-        
-        ofDrawCone(0,0, rect.height/2., rect.height);
-        
-        ofPopMatrix();
+            
+            ofxScrollView::end();
+
     }
     
     void update(){
@@ -37,45 +42,62 @@ ofxTableView *tbv;
 myCustomCell myCell;
 float rot;
 float spin;
+int dir;
 
 //--------------------------------------------------------------
 void testApp::setup(){	
 
+
+    glEnable(GL_DEPTH_TEST);
+    
     
     vc = new ofxTableViewController;
     
-    tbv = vc->addTableView(0,0,ofGetWidth(),ofGetHeight());
+    tbv = vc->addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
     
-    tbv->setFgColor(ofColor(0,100,10,255));
+    tbv->delegate = this;
+    
+    tbv->setFgColor(ofColor(255));
     tbv->setBgColor(ofColor(0,100,200,100));
+    
+
+    
+    ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
+    
+    ofxTableViewCell *image = scroller->addCell(ofxTableViewCellStylePicture, .5);
+    
+    image->setImageFromDisk("Icon@2x.png");
+    
+    ofxTableViewCell *header = scroller->addCell(ofxTableViewCellStyleText, .5);
+    
+    header->setString(string("HELLO !!!"));
+
     
     for (int i = 0; i < 10; i++){
         
-        tbv->addCell(ofxTableViewCellStyleText, .125);
+        float scale = random() %2 + 1;
         
-        ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
-        
-        for (int i = 0; i < random()%20 + 1; i++) {
-            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25);
-            
-            picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
-            
-            
+        if (scale > 1){
+        ofxTableViewCell *text = tbv->addCell(ofxTableViewCellStyleText, .125);
+        text->setString("OFX TABLE VIEW !!!");
         }
         
-        myCustomCell *newCell = new myCustomCell;
-        
-        newCell->initWithParent(scroller, ofxTableViewCellStyleCustom, .5);
-        
-        newCell->setBgColor(ofColor(0,0,0,255));
-        
-        scroller->addChild(newCell);
-        
+        ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25 * scale);
         
         for (int i = 0; i < random()%20 + 1; i++) {
-            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25);
+            
+            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25 * scale);
             
             picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
+            
+            picture->setImageFromDisk("Icon@2x.png");
+            
+            myCustomCell *newCell = new myCustomCell;
+            
+            
+            scroller->addCustomCell(newCell, .33);
+            
+            newCell->drawsBorder = false;
             
             
         }
@@ -86,8 +108,26 @@ void testApp::setup(){
     
 }
 
+void testApp::cellWasSelected(ofxTableViewCell *cell){
+    
+    ofLogNotice("tableView") << "selected section: " + ofToString(cell->getIndexPath()[0]) + " index: " + ofToString(cell->getIndexPath()[1]);
+    
+}
+
 //--------------------------------------------------------------
 void testApp::update(){
+    
+    if (dir){
+        if (rot < 30) rot+=.1; else dir=0;
+    }
+    else {
+        if (rot > -30) rot-=.1; else dir=1;
+    }
+    
+    
+    
+    spin < 360 ? spin ++ : spin = 0;
+   
     
     vc->update();
     
@@ -95,9 +135,14 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
+    ofPushMatrix();
+    
+        ofTranslate(ofGetWidth()/2., ofGetHeight()/2.);
+        glRotatef(rot, 0, 1, 0);
+    
     vc->draw();
     
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------

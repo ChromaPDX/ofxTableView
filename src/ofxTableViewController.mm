@@ -3,12 +3,12 @@
 #include "ofxTableView.h"
 
 
- ofxTableViewController:: ofxTableViewController()//constructor
+ofxTableViewController:: ofxTableViewController()//constructor
 {
     initialize();
 }
 
- ofxTableViewController::~ ofxTableViewController()//destructor
+ofxTableViewController::~ ofxTableViewController()//destructor
 {
 }
 
@@ -39,11 +39,11 @@ void     ofxTableViewController::initialize()
     //PanelList = new ofxTableView[5];
 }
 
-ofxTableView*    ofxTableViewController::addTableView(int x,int y,int w, int h)
+ofxTableView*    ofxTableViewController::addTableView(frame3d frame)
 {
     ofxTableView* tableView = new ofxTableView;
     
-    tableView->initWithParent(0, ofRectangle(x,y,w,h));
+    tableView->initWithParent(0, frame);
     
     tableViews.push_back(tableView);
     
@@ -58,7 +58,7 @@ void     ofxTableViewController::draw()
     {
         for (int i = 0; i <  tableViews.size(); i++ )
         {
-             tableViews[i]->draw();
+            tableViews[i]->draw();
         }
     }
 }
@@ -78,62 +78,52 @@ void     ofxTableViewController::unHide()
 
 
 void  ofxTableViewController::touchMoved(float x, float y, int touchId){
-     if (touchId == 0){
-    if (isHidden == false)
-    {
-
-        
-        
-        for (int i = 0; i <  tableViews.size(); i++ )
+    if (touchId == 0){
+        if (isHidden == false)
         {
-           
             
-            if (  tableViews[i]->containsPoint(x,y) == true)
-            {
-                NSLog(@"touch moved! %f %f %d", x,y,touchId);
-
-                 tableViews[i]->touchMoved(x,y,touchId);
-            }
-            else
+            
+            
+            for (int i = 0; i <  tableViews.size(); i++ )
             {
 
-            }
+                    tableViews[i]->touchMoved(x,y,touchId);
+                }
+
+            
         }
     }
-     }
 }
 
 void     ofxTableViewController::touchDown(float x, float y, int touchId){
     
-     if (touchId == 0){
-    if (isHidden == false)
-    {
-
-        
-        for (int i = 0; i <  tableViews.size(); i++ )
+    if (touchId == 0){
+        if (isHidden == false)
         {
-            if (  tableViews[i]->containsPoint(x,y) == true)
-            {
-               
-                 tableViews[i]->touchDown(x,y,touchId);
-            }
-
             
-        }//end panel size.
+            
+            for (int i = 0; i <  tableViews.size(); i++ )
+            {
+                
+ 
+                    tableViews[i]->touchDown(x,y,touchId);
+      
+                
+            }//end panel size.
+        }
     }
-     }
 }
 
 void  ofxTableViewController::touchUp(float x, float y, int touchId){
     if (touchId == 0){
-    if (isHidden == false)
-    {
-        
-        for (int i = 0; i <  tableViews.size(); i++ )
+        if (isHidden == false)
         {
-             tableViews[i]->touchUp(x, y, touchId);
+            
+            for (int i = 0; i <  tableViews.size(); i++ )
+            {
+                tableViews[i]->touchUp(x, y, touchId);
+            }
         }
-    }
     }
 }
 

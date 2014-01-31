@@ -17,6 +17,7 @@
 		29B39F181894C57C00814331 /* ofxTableViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B39F041894C57C00814331 /* ofxTableViewController.mm */; };
 		5326AEA810A23A0500278DE6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5326AEA710A23A0500278DE6 /* CoreLocation.framework */; };
 		53F323EB10A20EDB00E0DAE4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */; };
+		61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61860D9318984BC400CFEE44 /* ucontainer.cpp */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
 		678E130A17951536005B6D19 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130917951536005B6D19 /* Icon.png */; };
 		678E130C1795153C005B6D19 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130B1795153C005B6D19 /* Default.png */; };
@@ -68,6 +69,9 @@
 		5326AEA710A23A0500278DE6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		533A9201BFCAA6F93D776874 /* ofxMultiTouch.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxMultiTouch.cpp; path = ../../ofxMultiTouch/src/ofxMultiTouch.cpp; sourceTree = SOURCE_ROOT; };
 		53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		61860D9218984BC400CFEE44 /* ofxTableViewNSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTableViewNSUtils.h; sourceTree = "<group>"; };
+		61860D9318984BC400CFEE44 /* ucontainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ucontainer.cpp; sourceTree = "<group>"; };
+		61860D9418984BC400CFEE44 /* ucontainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ucontainer.h; sourceTree = "<group>"; };
 		678E130717951530005B6D19 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "bin/data/Icon@2x.png"; sourceTree = "<group>"; };
 		678E130917951536005B6D19 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = bin/data/Icon.png; sourceTree = "<group>"; };
 		678E130B1795153C005B6D19 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = bin/data/Default.png; sourceTree = "<group>"; };
@@ -136,6 +140,9 @@
 		29B39EFC1894C57C00814331 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				61860D9218984BC400CFEE44 /* ofxTableViewNSUtils.h */,
+				61860D9318984BC400CFEE44 /* ucontainer.cpp */,
+				61860D9418984BC400CFEE44 /* ucontainer.h */,
 				29B39EFD1894C57C00814331 /* ofxScrollView.h */,
 				29B39EFE1894C57C00814331 /* ofxScrollView.mm */,
 				29B39EFF1894C57C00814331 /* ofxTableView.h */,
@@ -371,6 +378,7 @@
 				E4D8936F11527B74007E1F53 /* testApp.mm in Sources */,
 				29B39F181894C57C00814331 /* ofxTableViewController.mm in Sources */,
 				104880F75437BBEC8B04A578 /* ofxMultiTouch.cpp in Sources */,
+				61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
