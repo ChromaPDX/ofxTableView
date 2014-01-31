@@ -61,19 +61,16 @@ ofxTableViewCell*    ofxTableViewCell::addCell(ofxTableViewCellStyle ncellStyle,
     newCell->initWithParent(this, ncellStyle, nautoSizePct);
     
     addDataSourceForCell(newCell);
-
     
     return newCell;
     
 }
 
-void ofxTableViewCell::addCustomCell(ofxTableViewCell* custom, float nautoSizePct)
-{
-
-    custom->initWithParent(this, ofxTableViewCellStyleCustom, nautoSizePct);
+void  ofxTableViewCell::addCustomCell(ofxTableViewCell *newCell, float autoSizePct){
     
-    addDataSourceForCell(custom);
-
+    newCell->initWithParent(this, ofxTableViewCellStyleCustom, autoSizePct);
+    
+    addDataSourceForCell(newCell);
     
 }
 
@@ -117,6 +114,13 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
         scrollingEnabled = true;
         
         
+    }
+    
+    else if (style == ofxTableViewCellStyleContainer){
+        scrollDirectionVertical = false;
+        scrollingEnabled = false;
+        horizontalPadding = 0;
+        verticalPadding = 0;
     }
     
     else if (style == ofxTableViewCellStyleModal){
@@ -364,6 +368,7 @@ void ofxTableViewCell::setModalTable(ofxScrollView *modal){
     NSLog(@"set nested table called: %s for cell %d",((ofxTableView*)dataSource)->displayName.c_str(), referenceId);
     
 }
+
 
 bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
     

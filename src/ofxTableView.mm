@@ -18,12 +18,18 @@ ofxTableView::~ofxTableView()//destructor
 
 #pragma mark - @OVERRIDE
 
+void ofxTableView::initWithParent(ofxScrollView* parent, float nautoSizePct){
+    
+    initWithParent(parent,frame3d(0, 0, 0, parent->getWidth(), parent->getHeight() * nautoSizePct));
+    autoSizePct = nautoSizePct;
+    
+}
+
 void ofxTableView::initWithParent(ofxScrollView *nparent, frame3d frame) {
     
     ofxScrollView::initWithParent(nparent, frame);
 
     dictionary.init_array();
-
 
     displayName = "TABLE VIEW";
     
@@ -49,6 +55,29 @@ ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, flo
 
 }
 
+void  ofxTableView::addCustomCell(ofxTableViewCell *newCell, float autoSizePct){
+    
+    newCell->initWithParent(this, ofxTableViewCellStyleCustom, autoSizePct);
+    
+    addDataSourceForCell(newCell);
+    
+}
+
+ofxTableView*    ofxTableView::addTable(float nautoSizePct)
+{
+    
+    ofxTableView *nestedTable = new ofxTableView;
+    
+    nestedTable->initWithParent(this, nautoSizePct);
+    
+    dictionary[nestedTable->referenceId] = nestedTable->dictionary;
+    
+    nestedTable->scrollDirectionVertical = false;
+    
+    return nestedTable;
+    
+}
+
 
 void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
     
@@ -61,20 +90,12 @@ void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
 
     }
     
-    else if (cell->cellStyle == ofxTableViewCellStyleGraph) {
+    else if (cell->cellStyle == ofxTableViewCellStyleGraph || cell->cellStyle == ofxTableViewCellStyleScroll || cell->cellStyle == ofxTableViewCellStyleContainer) {
         
         dictionary[cell->referenceId]["array"].init_array();
         
         cell->dataSource = &dictionary[cell->referenceId]["array"];
 
-    }
-    
-    else if (cell->cellStyle == ofxTableViewCellStyleScroll) {
-        
-        dictionary[cell->referenceId]["array"].init_array();
-        
-        cell->dataSource = &dictionary[cell->referenceId]["array"];
-        
     }
     
     else {
@@ -93,13 +114,10 @@ void ofxTableView::draw(){
 
     
     if (!raster.isAllocated()) {
-        raster.allocate(bounds.width, bounds.height);
+        raster.allocate(myFrame.w, myFrame.h);
     }
     
-    ofEnableAlphaBlending();
-    
   
-    
     if (clipToBounds) {
         
         raster.begin();
@@ -116,7 +134,7 @@ void ofxTableView::draw(){
         
         raster.end();
         
-        raster.draw(bounds.x, bounds.y);
+        raster.draw(getDrawFrame().x, getDrawFrame().y);
         
     }
     
@@ -125,12 +143,9 @@ void ofxTableView::draw(){
             
             ofxScrollView::begin();
         
-
-        
             // CUSTOM DRAW CODE
         
             //NSLog(@"drawLocation: P: %f %f %f S: %f %f", getX(), getY(),getZ(),getWidth(),getHeight());
-        
             
             ofxScrollView::end();
             

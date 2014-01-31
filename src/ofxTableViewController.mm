@@ -39,6 +39,18 @@ void     ofxTableViewController::initialize()
     //PanelList = new ofxTableView[5];
 }
 
+ofxTableView*    ofxTableViewController::addTableView(){
+    return addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
+}
+
+ofxTableView*    ofxTableViewController::addTableView(int x, int y, int w, int h){
+    return addTableView(frame3d(x,y,0,w, h));
+}
+
+ofxTableView*    ofxTableViewController::addTableView(int x, int y, int z, int w, int h){
+    return addTableView(frame3d(x,y,z,w, h));
+}
+
 ofxTableView*    ofxTableViewController::addTableView(frame3d frame)
 {
     ofxTableView* tableView = new ofxTableView;

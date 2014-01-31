@@ -60,12 +60,12 @@ class frame3d {
         h=nh;
     }
     
-    frame3d(ofPoint pos, ofRectangle bounds){
+    frame3d(ofPoint pos, ofPoint size){
         x=pos.x;
         y=pos.y;
         z=pos.z;
-        w=bounds.width;
-        h=bounds.height;
+        w=size.x;
+        h=size.y;
     }
     
     frame3d& operator= (const frame3d& emp)  // Assignment operator overloading function
@@ -162,7 +162,7 @@ private:
 
 protected:
     
-    ofRectangle bounds;
+    frame3d myFrame;
     
     
     float alpha;

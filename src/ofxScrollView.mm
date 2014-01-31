@@ -19,6 +19,7 @@ ofxScrollView::~ ofxScrollView()//destructor
 
 #pragma mark - INIT + Children
 
+
 void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
     
     setFrame(frame);
@@ -53,6 +54,7 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
     }
     
     else {
+        
         
         
         localTint = 1.;
@@ -92,6 +94,8 @@ void ofxScrollView::addChild(ofxScrollView *child){
     child->referenceId = children.size();
     child->displayId = child->referenceId;
     child->hidden = false;
+        
+    
     
     cdirty = true;
     
@@ -227,9 +231,9 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
         case TransitionStyleExitToLeft:
             
-            childAnimation->sourceFrame = frame3d(bounds.x+bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            childAnimation->sourceFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
             
-            currentAnimation->destFrame = frame3d(bounds.x-bounds.width, bounds.y,getZ(), bounds.width, bounds.height);
+            currentAnimation->destFrame = frame3d(myFrame.x-myFrame.w, myFrame.y,getZ(), myFrame.w, myFrame.h);
             childAnimation->style = TransitionStyleEnterFromRight;
             
             
@@ -239,9 +243,9 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
         case TransitionStyleExitToRight:
             
-            childAnimation->sourceFrame = frame3d(bounds.x-bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            childAnimation->sourceFrame = frame3d(myFrame.x-myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
             
-            currentAnimation->destFrame = frame3d(bounds.x+bounds.width, bounds.y, getZ(), bounds.width, bounds.height);
+            currentAnimation->destFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, getZ(), myFrame.w, myFrame.h);
             childAnimation->style = TransitionStyleEnterFromLeft;
 
             break;
@@ -250,14 +254,14 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
             child->hidden = false;
             
-            childAnimation->sourceFrame = frame3d(child->getGlobalPosition(), child->bounds);
+            childAnimation->sourceFrame = child->getFrame();
             
            // logFrame(frame3d(child->getFrame()));
-           // logFrame(frame3d(child->getGlobalPosition(), child->bounds));
+           // logFrame(frame3d(child->getGlobalPosition(), child->myFrame));
             
             _modalChild->cachedFrame = childAnimation->sourceFrame;
             
-            currentAnimation->destFrame = frame3d(getX(), getY(), getZ()+1000, bounds.width,bounds.height);
+            currentAnimation->destFrame = frame3d(getX(), getY(), getZ()+1000, myFrame.w,myFrame.h);
             
             childAnimation->style = TransitionStyleZoomOut;
             
@@ -271,8 +275,8 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     }
     
     NSLog(@"Starting Animation");
-    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
@@ -318,7 +322,7 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromLeft:
             
-            currentAnimation->destFrame = frame3d(getX()+bounds.width, getY(), getZ(), bounds.width, bounds.height);
+            currentAnimation->destFrame = frame3d(getX()+myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
             
             childAnimation->style = TransitionStyleExitToRight;
             
@@ -330,7 +334,7 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromRight:
             
-            currentAnimation->destFrame = frame3d(getX()-bounds.width, getY(), getZ(), bounds.width, bounds.height);
+            currentAnimation->destFrame = frame3d(getX()-myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
             
             childAnimation->style = TransitionStyleExitToLeft;
             
@@ -346,7 +350,7 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
             //_modalChild->cachedFrame = _modalChild->getFrame();
             
-            currentAnimation->destFrame = frame3d(getX(), getY(), 0, bounds.width,bounds.height);
+            currentAnimation->destFrame = frame3d(getX(), getY(), 0, myFrame.w,myFrame.h);
             
             childAnimation->destFrame = _modalChild->cachedFrame;
             
@@ -366,8 +370,8 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
     }
     
     NSLog(@"Starting Animation");
-    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
@@ -568,18 +572,23 @@ void ofxScrollView::begin() {
         ofDrawSphere(getPosition(), 10);
     }
 
+    if (!parent) {
+    
+        // I AM ROOT DO SOME CONFIG
+        ofEnableDepthTest();
+        ofEnableAlphaBlending();
+        
+    }
+    
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
     {
         
-
         ofRectangle d = getDrawFrame();
-        
-        
-        
+
         if (shouldRasterize){
             
             if (!raster.isAllocated()) {
-                raster.allocate(bounds.width, bounds.height);
+                raster.allocate(myFrame.w, myFrame.h);
             }
             raster.begin();
             
@@ -731,9 +740,9 @@ float ofxScrollView::outOfBounds(){
         
         else {
             
-            if (getContentSize() > bounds.height) {
+            if (getContentSize() > myFrame.h) {
                 
-                int diff = scrollPosition + getContentSize() - bounds.height;
+                int diff = scrollPosition + getContentSize() - myFrame.h;
                 if (diff < 0){
                     
                     return diff;
@@ -759,9 +768,9 @@ float ofxScrollView::outOfBounds(){
         
         else {
             
-            if (getContentSize() > bounds.width) {
+            if (getContentSize() > myFrame.w) {
                 
-                int diff = scrollPosition + getContentSize() - bounds.width;
+                int diff = scrollPosition + getContentSize() - myFrame.w;
                 
                 if (diff < 0){
                     
@@ -791,11 +800,13 @@ bool ofxScrollView::scrollShouldCull() {
         
         if (_parent->scrollingEnabled) {
             
-            if (_parent->scrollDirectionVertical && (getY() + bounds.height/2. < _parent->getDrawFrame().y || getY() - bounds.height/2. > _parent->getDrawFrame().y + _parent->getHeight())) {
+            ofRectangle d = _parent->getDrawFrame();
+            
+            if (_parent->scrollDirectionVertical && (getY() + myFrame.h/2. < d.y || getY() - myFrame.h/2. > d.y + _parent->getHeight())) {
                 return true;
             }
             
-            else if (getX() + bounds.width < _parent->getDrawFrame().x || getX() > _parent->getDrawFrame().x + _parent->getWidth()) {
+            else if (getX() + myFrame.w/2. < d.x || getX() - myFrame.w/2. > d.x + d.width) {
                 return true;
             }
 
@@ -808,16 +819,16 @@ bool ofxScrollView::scrollShouldCull() {
 
 ofVec3f ofxScrollView::getCenter(){
 
-    return ofVec3f(getX()-bounds.width/2., getY()-bounds.height/2., getZ());
+    return ofVec3f(getX()-myFrame.w/2., getY()-myFrame.h/2., getZ());
     
 }
 
 int  ofxScrollView::getHeight() {
-    return bounds.height;
+    return myFrame.h;
 }
 
 int  ofxScrollView::getWidth() {
-    return bounds.width;
+    return myFrame.w;
 }
 
 int ofxScrollView::getContentSize(){
@@ -875,12 +886,12 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
                 tempSize += temp + verticalPadding;
             }
             
-            float childSize = bounds.height * v->autoSizePct;
+            float childSize = myFrame.h * v->autoSizePct;
             
             v->setFrame(frame3d((horizontalPadding / 2.),
-                                -bounds.height/2. + tempSize + scrollPosition + childSize/2.,
+                                tempSize + scrollPosition + childSize/2. - myFrame.h/2.,
                                 1,
-                                bounds.width-(horizontalPadding),
+                                myFrame.w-(horizontalPadding),
                                 childSize
                                 ));
             
@@ -896,13 +907,13 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
                 tempSize += temp + horizontalPadding;
             }
             
-            float childSize = bounds.width * v->autoSizePct;
+            float childSize = myFrame.w * v->autoSizePct;
             
-            v->setFrame(frame3d(-bounds.width/2. + tempSize + scrollPosition + childSize/2.,
+            v->setFrame(frame3d(tempSize + scrollPosition + childSize/2. - myFrame.w/2.,
                                 (verticalPadding/2.),
                                 1,
                                 childSize,
-                                bounds.height - verticalPadding));
+                                myFrame.h - verticalPadding));
         }
         
         
@@ -910,23 +921,18 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
 
         
     }
-
-    
-    
-    
-    
     
 }
 
 frame3d ofxScrollView::getFrame() {
     
-    return frame3d(getPosition(), bounds);
+    return frame3d(getPosition(), myFrame.getSize());
     
 }
 
 frame3d ofxScrollView::getGlobalFrame() {
     
-    return frame3d(getGlobalPosition(), bounds);
+    return frame3d(getGlobalPosition(), myFrame.getSize());
     
 }
 
@@ -937,20 +943,17 @@ ofRectangle ofxScrollView::getDrawFrame(){
 
 void ofxScrollView::setFrame(frame3d frame){
     
-    if (bounds.height != frame.h || bounds.width != frame.w || getZ() != frame.z) { // SCALED, refresh content size
+    if (myFrame.h != frame.h || myFrame.w != frame.w || getZ() != frame.z) { // SCALED, refresh content size
         cdirty = true;
     }
     
     setPosition(frame.x, frame.y, frame.z);
     
-    bounds = frame.getBounds();
+    myFrame = frame;
     
     fdirty = true;
     
-    //setPosition(nbounds.x + nbounds.width/2., nbounds.y+nbounds.height/2, getZ());
-    
-   
-
+    //setPosition(nmyFrame.x + nmyFrame.w/2., nmyFrame.y+nmyFrame.h/2, getZ());
 }
 
 
@@ -967,16 +970,16 @@ void ofxScrollView::scaleFrame(float scale){
 //        
 //        float rScale = 1 + dScale;
 //        
-//        bounds = ofRectangle(0,0,bounds.width * rScale,bounds.height * rScale);
+//        myFrame = ofRectangle(0,0,myFrame.w * rScale,myFrame.h * rScale);
 //        
-//        setFrame(ofRectangle(bounds.x, bounds.y, bounds.width, bounds.height));
+//        setFrame(ofRectangle(myFrame.x, myFrame.y, myFrame.w, myFrame.h));
 //        
-//        _xRootOffset = bounds.x;
-//        _yRootOffset = bounds.y;
+//        _xRootOffset = myFrame.x;
+//        _yRootOffset = myFrame.y;
 //        
 //        _scale += dScale;
 //        
-//        raster.allocate(bounds.width, bounds.height);
+//        raster.allocate(myFrame.w, myFrame.h);
 //        
 //        NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
 //        
@@ -988,7 +991,7 @@ ofRectangle     ofxScrollView::getWorldFrame(){
     
     ofPoint g = getGlobalPosition();
 
-    return ofRectangle(g.x - bounds.width/2.,g.y-bounds.height/2., bounds.width, bounds.height);
+    return ofRectangle(g.x - myFrame.w/2.,g.y-myFrame.h/2., myFrame.w, myFrame.h);
         
 }
 
@@ -1008,7 +1011,7 @@ bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is w
     if ( lx > d.x && lx < d.x + d.width && ly > d.y && ly < d.y + d.height)
     {
         
-     //   NSLog(@"in rect %f %f %f %f",d.x-bounds.width/2.,d.y-bounds.height/2., bounds.width, bounds.height);
+     //   NSLog(@"in rect %f %f %f %f",d.x-myFrame.w/2.,d.y-myFrame.h/2., myFrame.w, myFrame.h);
         withinArea = true;
     }
     return withinArea;
@@ -1018,18 +1021,22 @@ bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is w
 
 void ofxScrollView::setHighlighted(bool setHighlighted) {
     
-    if (scrollingEnabled) {
-        if (!setHighlighted) {
-            for (int i = 0; i < children.size(); i++ )
-            {
-                children[i]->setHighlighted(false);
+    //if (highlighted != setHighlighted) {
+        
+        if (children.size()) {
+            if (!setHighlighted) {
+                for (int i = 0; i < children.size(); i++ )
+                {
+                    children[i]->setHighlighted(false);
+                }
             }
         }
-    }
-    
-    else {
-        highlighted = setHighlighted;
-    }
+        
+        else {
+            highlighted = setHighlighted;
+        }
+        
+   // }
     
 }
 
@@ -1084,15 +1091,18 @@ bool     ofxScrollView::touchDown(float x , float y, int touchId)
         
         drag = 1.5;
         
+        
+        
     }
     
     else {
+        
         for (int i = 0; i < children.size(); i++ )
         {
             if  (!children[i]->hidden){
+                
                 if ( children[i]->containsPoint(x,y) == true)
                 {
-                    children[i]->setHighlighted(true);
                     children[i]->touchDown(x, y, touchId);
                     hit = false;
                 }
@@ -1103,7 +1113,14 @@ bool     ofxScrollView::touchDown(float x , float y, int touchId)
                 }
             }
         }
+        
+        if (hit) {
+            setHighlighted(true);
+        }
+        
     }
+    
+
     
     return hit;
     
@@ -1168,13 +1185,8 @@ bool     ofxScrollView::touchMoved(float x, float y, int touchId)
                 if  (!children[i]->hidden){
                     if ( children[i]->containsPoint(x,y) == true)
                     {
-                        children[i]->setHighlighted(true);
                         children[i]->touchDown(x, y, touchId);
                         hit = false;
-                    }
-                    else
-                    {
-                        children[i]->setHighlighted(false);
                     }
                 }
             }
@@ -1196,6 +1208,7 @@ bool     ofxScrollView::touchMoved(float x, float y, int touchId)
                         hit = false;
                         
                     }
+         
                 }
             }
             
@@ -1217,7 +1230,7 @@ bool     ofxScrollView::touchMoved(float x, float y, int touchId)
         }
         
     }
-    
+
     return hit;
     
 }
@@ -1232,6 +1245,17 @@ bool     ofxScrollView::touchUp(float x, float y, int touchId)
         return 0;
     }
     
+    for (int i = 0; i < children.size(); i++ )
+    {
+        if  (!children[i]->hidden){
+            
+            if (! children[i]->containsPoint(x,y) == true)
+            {
+                children[i]->setHighlighted(false);
+            }
+        }
+    }
+
     if (scrollingEnabled) {
         
         if (scrollPhase == ScrollPhaseFailed || scrollPhase == ScrollPhaseBegan || scrollPhase == ScrollPhaseNil) {
@@ -1250,13 +1274,11 @@ bool     ofxScrollView::touchUp(float x, float y, int touchId)
             for (int i = 0; i < children.size(); i++ )
             {
                 
-                children[i]->setHighlighted(false);
+                //children[i]->setHighlighted(false);
                 
                 if ( children[i]->containsPoint(x,y) == true)
                 {
                     children[i]->touchUp(x, y, touchId);
-                    children[i]->setHighlighted(true);
-                    
                     hit = false;
                 }
                 
@@ -1289,10 +1311,17 @@ bool     ofxScrollView::touchUp(float x, float y, int touchId)
                 children[i]->touchUp(x, y, touchId);
                 hit = false;
             }
+            else {
+                children[i]->setHighlighted(false);
+            }
             
         }
         
         
+    }
+    
+    if (hit) {
+        setHighlighted(true);
     }
     
     return hit;

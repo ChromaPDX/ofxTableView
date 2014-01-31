@@ -68,11 +68,14 @@ public:
     ofxTableViewDelegate *delegate = NULL;
     
     ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    void addCustomCell(ofxTableViewCell *custom, float autoSizePct);
+    
+    ofxTableView* addTable(float nautoSizePct);
     
     // @OVERRIDE FROM BASE CLASS
     
     void            initWithParent(ofxScrollView *parent, frame3d frame);
-
+    void            initWithParent(ofxScrollView* parent, float nautoSizePct);
     void            draw();
 
     // @METHODS

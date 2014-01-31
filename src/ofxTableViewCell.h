@@ -43,12 +43,13 @@ typedef enum ofxTableViewCellStyle {
     ofxTableViewCellStyleDefault,
     ofxTableViewCellStyleText,
     ofxTableViewCellStylePicture,
-    ofxTableViewCellStyleSlider,
+    ofxTableViewCellStyleContainer,
     ofxTableViewCellStyleModal,
     ofxTableViewCellStyleRadio,
     ofxTableViewCellStyleScroll,
     ofxTableViewCellStyleRadialPicker,
     ofxTableViewCellStyleGraph,
+    ofxTableViewCellStyleSlider,
     ofxTableViewCellStyleCustom
     
 } ofxTableViewCellStyle;
@@ -69,8 +70,9 @@ public:
     
     void initWithParent(ofxTableView *nparent, ofxTableViewCellStyle cellStyle, float autoSizePct);
     void initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    
     ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
-    void addCustomCell(ofxTableViewCell* custom, float nautoSizePct);
+    void addCustomCell(ofxTableViewCell *custom, float autoSizePct);
     
     void initStyle(ofxTableViewCellStyle cellStyle);
 
