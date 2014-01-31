@@ -34,4 +34,8 @@ inline ofImage imgFromUIImage(UIImage* img) {
     
 }
 
+inline void logFrame(frame3d frame){
+    NSLog(@"FRAME3D :: %f %f %f :: %f %f", frame.x, frame.y, frame.z, frame.w, frame.h);
+}
+
 #endif

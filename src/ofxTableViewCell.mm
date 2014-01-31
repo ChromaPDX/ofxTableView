@@ -16,12 +16,12 @@ ofxTableViewCell::~ofxTableViewCell()//destructor
 {
 }
 
-void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellStyle ncellStyle, float nheightPct){
+void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct){
     
-    ofxScrollView::initWithParent(nparent,ofRectangle(0, 0, nparent->getWidth(), nparent->getHeight()*nheightPct));
+    ofxScrollView::initWithParent(nparent,frame3d(0, 0, 0, nparent->getWidth(), nparent->getHeight()*nautoSizePct));
     
     cellStyle = ncellStyle;
-    heightPct = nheightPct;
+    autoSizePct = nautoSizePct;
 
     scrollingEnabled = false;
     scrollDirectionVertical = false;
@@ -35,12 +35,12 @@ void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellSty
                                   
 }
 
-void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nwidthPct){
+void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct){
     
-    ofxScrollView::initWithParent(nparent,ofRectangle(0, 0, nwidthPct * nparent->getWidth(), nparent->getHeight()));
+    ofxScrollView::initWithParent(nparent,frame3d(0, 0, 0, nautoSizePct * nparent->getWidth(), nparent->getHeight()));
     
     cellStyle = ncellStyle;
-    widthPct = nwidthPct;
+    autoSizePct = nautoSizePct;
 
     scrollingEnabled = false;
     scrollDirectionVertical = false;
@@ -54,26 +54,23 @@ void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCel
     
 }
 
-ofxTableViewCell*    ofxTableViewCell::addCell(ofxTableViewCellStyle ncellStyle, float nWidthPct)
+ofxTableViewCell*    ofxTableViewCell::addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
 {
     ofxTableViewCell *newCell = new ofxTableViewCell;
     
-    newCell->initWithParent(this, ncellStyle, nWidthPct);
-    
-    addChild(newCell);
+    newCell->initWithParent(this, ncellStyle, nautoSizePct);
     
     addDataSourceForCell(newCell);
+
     
     return newCell;
     
 }
 
-void ofxTableViewCell::addCustomCell(ofxTableViewCell* custom, float nWidthPct)
+void ofxTableViewCell::addCustomCell(ofxTableViewCell* custom, float nautoSizePct)
 {
 
-    custom->initWithParent(this, ofxTableViewCellStyleCustom, nWidthPct);
-    
-    addChild(custom);
+    custom->initWithParent(this, ofxTableViewCellStyleCustom, nautoSizePct);
     
     addDataSourceForCell(custom);
 
@@ -145,29 +142,6 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
 
 }
 
-ofRectangle  ofxTableViewCell::getChildRect(ofxScrollView *v){
-    
-    if (fdirty) {
-
-        //   NSLog(@"rasterizing!!");
-        if (cellStyle == ofxTableViewCellStyleRadialPicker){
-            return v->getFrame();
-        }
-        
-//        else if (getRoot()->_modalChild && cellStyle == ofxTableViewCellStyleModal) {
-//            return v->getFrame();
-//        }
-//
-//        
-        else return ofxScrollView::getChildRect(v);
-        
-    }
-    
-    else {
-        return v->getFrame();
-    }
-    
-}
 
 void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
   
@@ -225,19 +199,27 @@ int* ofxTableViewCell::getIndexPath(){
 }
 
 
-void    ofxTableViewCell::draw(ofRectangle rect)
+void    ofxTableViewCell::draw()
 {
+    
     
     if (!hidden) {
         
-        ofxScrollView::begin(rect);
+        
+        ofxScrollView::begin();
+        
+
+        ofRectangle d = getDrawFrame();
         
         if (cellStyle == ofxTableViewCellStyleText) {
             
             ofSetColorf(fgColor);
             
-            sharedFont->drawString((string)*dataSource, rect.x + rect.width/2. - (sharedFont->stringWidth((string)*dataSource)/2.), rect.y + rect.height/2. + (sharedFont->stringHeight((string)*dataSource)/2.));
-            
+            ofPushMatrix();
+            glTranslatef(0, 0, 1);
+            sharedFont->drawString((string)*dataSource, -(sharedFont->stringWidth((string)*dataSource)/2.), (sharedFont->stringHeight((string)*dataSource)/2.));
+            ofPopMatrix();
+
         }
         
         else if (cellStyle == ofxTableViewCellStyleGraph){
@@ -250,14 +232,14 @@ void    ofxTableViewCell::draw(ofRectangle rect)
                     ofSetColorf(fgColor);
                     ofPath path;
                     
-                    path.moveTo(0, rect.height);
+                    path.moveTo(0, d.height);
                     
                     int max = 0;
                     for(int i = 0; i < dataSource->size(); i++){
                         if (max < (int)(*dataSource)[i]) max = (*dataSource)[i];
                     }
-                    float yscale = (float)rect.height / max;
-                    float xscale = (rect.width/dataSource->size());
+                    float yscale = (d.height) / max;
+                    float xscale = (d.width/dataSource->size());
                     
                     for(int i = 0; i < dataSource->size(); i++){
                         
@@ -265,10 +247,10 @@ void    ofxTableViewCell::draw(ofRectangle rect)
                         
                     }
                     
-                    path.lineTo(rect.width, rect.height);
+                    path.lineTo(d.width, d.height);
 
                     
-                    path.draw(rect.x, rect.y);
+                    path.draw(d.x, d.y);
 
                 }
 
@@ -285,44 +267,43 @@ void    ofxTableViewCell::draw(ofRectangle rect)
                 _image.loadImage(*dataSource);
             }
 
-
-            float scale = MIN(rect.height / _image.height, rect.width / _image.width);
-            _image.draw(rect.x + ((rect.width - _image.width*scale) / 2.),rect.y+((rect.height - _image.height*scale) / 2.),_image.width*scale, _image.height*scale);
+            float scale = MIN(d.height / _image.height, d.width / _image.width);
+            _image.draw(d.x + ((d.width - _image.width*scale) / 2.),d.y+((d.height - _image.height*scale) / 2.),_image.width*scale, _image.height*scale);
 
             
         }
         
-        else if (cellStyle == ofxTableViewCellStyleSlider) {
-            drawSlider(rect);
-        }
+//        else if (cellStyle == ofxTableViewCellStyleSlider) {
+//            drawSlider(rect);
+//        }
         
-        if (customDrawFunction) {
-            customDrawFunction(rect, customDrawData);
-        }
+//        if (customDrawFunction) {
+//            customDrawFunction(rect, customDrawData);
+//        }
         
         
-        ofxScrollView::end(rect);
+        ofxScrollView::end();
         
     }
     
 }
 
-void ofxTableViewCell::drawSlider(ofRectangle rect){
-    
-    float percent = ((floatValue - minValue) / (maxValue - minValue));
-    
-    int slideWidth = int(percent*(float)rect.width);
-    
-    ofFill();
-    
-    ofSetColorf(fgColor);
-    
-//    if (fgColor != 0) ofSetColor(fgColor);
-//    else ofSetColor(parent->fgColor);
-
-    ofRect(rect.x, rect.y, slideWidth, rect.height);
-    
-}
+//void ofxTableViewCell::drawSlider(){
+//    
+//    float percent = ((floatValue - minValue) / (maxValue - minValue));
+//    
+//    int slideWidth = int(percent*(float)rect.width);
+//    
+//    ofFill();
+//    
+//    ofSetColorf(fgColor);
+//    
+////    if (fgColor != 0) ofSetColor(fgColor);
+////    else ofSetColor(parent->fgColor);
+//
+//    ofRect(rect.x, rect.y, slideWidth, rect.height);
+//    
+//}
 
 void ofxTableViewCell::setString(string s){
     
@@ -384,21 +365,29 @@ void ofxTableViewCell::setModalTable(ofxScrollView *modal){
 
 bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
     
-    if (  ofxScrollView::touchUp(x, y, touchId) ){
-        
-        if (((ofxTableView*)getRoot())->delegate) {
-            ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
-        }
-        
-        if (cellStyle == ofxTableViewCellStyleModal) {
+    if (cellStyle == ofxTableViewCellStyleModal) {
+        if (!getRoot()->_modalChild){
             if (children.size()) {
                 NSLog(@"presenting modal table");
-                ((ofxTableView*)getRoot())->pushModalView(children[0], TransitionStyleExitToLeft, .33);
-            }
-            else {
-                getRoot()->_modalParent->popModalView(TransitionStyleEnterFromLeft, .33);
+                ((ofxTableView*)getRoot())->pushModalView(children[0], transitionStyle, transitionTime);
             }
         }
+        
+        if (getRoot()->_modalParent) {
+            getRoot()->_modalParent->popModalView(transitionStyle, transitionTime);
+        }
+        
+    }
+    
+    else if (  ofxScrollView::touchUp(x, y, touchId) ){
+        
+
+            if (((ofxTableView*)getRoot())->delegate) {
+                ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
+                logFrame(getGlobalFrame());
+            }
+            
+        
         
         return true;
         

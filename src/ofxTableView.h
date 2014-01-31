@@ -67,17 +67,14 @@ public:
     
     ofxTableViewDelegate *delegate = NULL;
     
-    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nheightPct);
+    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
     
     // @OVERRIDE FROM BASE CLASS
     
-    void            initWithParent(ofxScrollView *parent, ofRectangle frame);
+    void            initWithParent(ofxScrollView *parent, frame3d frame);
 
     void            draw();
-    
-    ofRectangle            getChildRect(ofxScrollView *v);
-    bool                    containsPoint(int x, int y);
-    
+
     // @METHODS
     JAD::UniversalContainer dictionary;
     

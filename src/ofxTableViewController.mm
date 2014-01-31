@@ -39,11 +39,11 @@ void     ofxTableViewController::initialize()
     //PanelList = new ofxTableView[5];
 }
 
-ofxTableView*    ofxTableViewController::addTableView(int x,int y,int w, int h)
+ofxTableView*    ofxTableViewController::addTableView(frame3d frame)
 {
     ofxTableView* tableView = new ofxTableView;
     
-    tableView->initWithParent(0, ofRectangle(x,y,w,h));
+    tableView->initWithParent(0, frame);
     
     tableViews.push_back(tableView);
     

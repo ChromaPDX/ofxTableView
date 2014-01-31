@@ -47,6 +47,7 @@ ofxTableView *tbv;
 myCustomCell myCell;
 float rot;
 float spin;
+int dir;
 
 //--------------------------------------------------------------
 void testApp::setup(){	
@@ -110,15 +111,33 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
     
+    if (dir){
+        if (rot < 30) rot+=.1; else dir=0;
+    }
+    else {
+        if (rot > -30) rot-=.1; else dir=1;
+    }
+    
+    
+    
+    spin < 360 ? spin ++ : spin = 0;
+   
+    
     vc->update();
     
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
+    ofPushMatrix();
+    
+        ofTranslate(ofGetWidth()/2., 0);
+        glRotatef(rot, 0, 1, 0);
+        ofTranslate(-ofGetWidth()/2., 0);
+    
     vc->draw();
     
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
