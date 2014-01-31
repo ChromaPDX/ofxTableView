@@ -220,6 +220,7 @@ public:
     
     void                    initWithParent(ofxScrollView *parent, frame3d frame);
     void                    addChild(ofxScrollView *child);
+    void                    insertChild(ofxScrollView *child);
     
     void                    update();
     
@@ -257,8 +258,8 @@ public:
 
     bool                    debugUI = false;
     
-    ofxScrollView * _modalParent = NULL;
-    ofxScrollView * _modalChild = NULL;
+    ofxScrollView *         _modalParent = NULL;
+    ofxScrollView *         _modalChild = NULL;
     
     float transitionTime;
     TransitionStyle transitionStyle;
@@ -304,6 +305,8 @@ public:
     bool            scrollingEnabled = false;
     bool            shouldRasterize = false;
     bool            clipToBounds = false;
+    bool            isModal = false;
+    
     
     bool            scrollShouldCull();
     

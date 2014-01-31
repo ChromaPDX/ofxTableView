@@ -62,31 +62,30 @@ void testApp::setup(){
     
     // 1 // SIMPLE HEADER
     
-    ofxTableViewCell *header = tbv->addCell(ofxTableViewCellStyleText, .125);
-    header->setString("ofxTableView Header");
+    tbv->addCellWithLabel("ofxTableView Header", .125);
     
     // 2 // CONTAINER CELL FOR HORIZONTAL SPLIT
     
-    ofxTableViewCell *containerCell = tbv->addCell(ofxTableViewCellStyleContainer, .25);
+    ofxTableViewCell *containerCell = tbv->addCellWithStyle(ofxTableViewCellStyleContainer, .25);
     
-    ofxTableViewCell *label = containerCell->addCell(ofxTableViewCellStyleText, .5);
+    ofxTableViewCell *label = containerCell->addCellWithStyle(ofxTableViewCellStyleText, .5);
     
     label->setString(string("Split view"));
     
-    ofxTableViewCell *image = containerCell->addCell(ofxTableViewCellStylePicture, .5);
+    ofxTableViewCell *image = containerCell->addCellWithStyle(ofxTableViewCellStylePicture, .5);
     
     image->setImageFromDisk("Icon@2x.png");
     
     // 3 // NESTED TABLE
 
-    ofxTableViewCell *text = tbv->addCell(ofxTableViewCellStyleText, .125);
+    ofxTableViewCell *text = tbv->addCellWithStyle(ofxTableViewCellStyleText, .125);
     text->setString("NESTED TABLE");
     
     ofxTableView *nestedTable = tbv->addTable(.5);
     
     for (int i = 0; i < 10 + 1; i++) {
         
-        ofxTableViewCell *picture = nestedTable->addCell(ofxTableViewCellStylePicture, .25);
+        ofxTableViewCell *picture = nestedTable->addCellWithStyle(ofxTableViewCellStylePicture, .33);
         
         picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
         
@@ -98,12 +97,40 @@ void testApp::setup(){
         
         nestedTable->addCustomCell(newCell, .25);
         
-        newCell->initWithParent(nestedTable, ofxTableViewCellStyleCustom, .25);
-
         newCell->drawsBorder = false;
     }
     
     // 5 // MODAL TABLE
+    
+    ofxTableViewCell *modal = tbv->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    modal->addCellWithLabel("MODAL TABLE", 1.);
+    
+    modal->transitionStyle = TransitionStyleZoomIn;
+    modal->transitionTime = 1.5;
+    
+    // add table first
+    
+    modalTable = new ofxTableView;
+    
+    modalTable->initWithParent(modal, modal->getFrame());
+    modalTable->isModal = true;
+    modal->addChild(modalTable);
+    
+    ofxTableViewCell *back = modalTable->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    back->addCellWithLabel("BACK", 1.);
+    
+    back->transitionStyle = TransitionStyleZoomOut;
+    back->transitionTime = 1.;
+    
+    // Create back button
+    
+    for (int i = 0; i < 10 + 1; i++) {
+     
+        modalTable->addCellWithLabel("table cell " + ofToString(i), .25);
+        
+    }
     
     
 

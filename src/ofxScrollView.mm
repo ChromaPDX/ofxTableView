@@ -90,16 +90,37 @@ void ofxScrollView::addChild(ofxScrollView *child){
     
     if (!hasChild(child)) {
         
-    
     child->referenceId = children.size();
     child->displayId = child->referenceId;
     child->hidden = false;
         
-    
-    
     cdirty = true;
     
     children.push_back(child);
+        
+    }
+    
+}
+
+void ofxScrollView::insertChild(ofxScrollView *child){
+    
+    
+    if (!hasChild(child)) {
+        
+        vector<ofxScrollView*>::iterator it;
+        
+        for ( it = children.begin(); it != children.end(); ){
+            (*it)->referenceId++;
+            (*it)->displayId++;
+        }
+        
+        child->referenceId = children.size();
+        child->displayId = child->referenceId;
+        child->hidden = false;
+        
+        cdirty = true;
+        
+        children.insert(children.begin(), child);
         
     }
     
@@ -154,8 +175,6 @@ void ofxScrollView::setParent(ofxScrollView *parent){
     
     if (parent) {
         
-        parent->addChild(this);
-        
         ofNode::setParent(*_parent, true);
     }
     
@@ -189,13 +208,10 @@ ofNode* ofxScrollView::getParent(){
 
 void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, float durationSec){
     
-    
-
-    
     _modalChild = child;
+    
     child->_modalParent = this;
     child->cachedOrientation = ofQuaternion(child->getOrientationQuat());
-    
 
     // Create My Transition Object
     
@@ -254,10 +270,9 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
             child->hidden = false;
             
-            childAnimation->sourceFrame = child->getFrame();
+            childAnimation->sourceFrame = child->_parent->getGlobalFrame();
             
-           // logFrame(frame3d(child->getFrame()));
-           // logFrame(frame3d(child->getGlobalPosition(), child->myFrame));
+            logFrame(child->getGlobalFrame());
             
             _modalChild->cachedFrame = childAnimation->sourceFrame;
             
@@ -274,9 +289,9 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             break;
     }
     
-    NSLog(@"Starting Animation");
-    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+//    NSLog(@"Starting Animation");
+//    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+//    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
@@ -369,9 +384,9 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
         childAnimation->sourceFrame = child->animations[child->animations.size()-1]->destFrame;
     }
     
-    NSLog(@"Starting Animation");
-    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+//    NSLog(@"Starting Animation");
+//    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+//    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
@@ -660,21 +675,11 @@ void ofxScrollView::end() {
         for(int i = 0; i < children.size(); i++)
         {
             
-            if (getRoot()->_modalChild) {
-                if (getRoot()->_modalChild != children[i]) {
-                    setChildFrame(children[i]);
-                    if (!children[i]->hidden) {
-                    children[i]->draw();
-                    }
-                }
+            setChildFrame(children[i]);
+            if (!children[i]->hidden) {
+                children[i]->draw();
             }
             
-            else {
-                setChildFrame(children[i]);
-                if (!children[i]->hidden) {
-                    children[i]->draw();
-                }
-            }
             
         }
         

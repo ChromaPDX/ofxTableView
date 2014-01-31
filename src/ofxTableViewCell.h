@@ -71,21 +71,20 @@ public:
     void initWithParent(ofxTableView *nparent, ofxTableViewCellStyle cellStyle, float autoSizePct);
     void initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct);
     
-    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    ofxTableViewCell* addCellWithLabel(string label, float autoSizePct);
+    ofxTableViewCell* addCellWithStyle(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
     void addCustomCell(ofxTableViewCell *custom, float autoSizePct);
+    ofxTableView* addTable(float nautoSizePct);
     
     void initStyle(ofxTableViewCellStyle cellStyle);
 
-    
+    void            begin();
     void            draw();
-    
-    // DRAW STYLES
-    
+    void            end();
 
     // SUB VIEWS
-    void addCell    (ofxTableViewCell *cell);
-    void addDataSourceForCell(ofxTableViewCell *cell);
     
+    void addDataSourceForCell(ofxTableViewCell *cell);
 
     void setString(string s);
     void setArray(vector<int> array);
@@ -104,8 +103,10 @@ public:
 
     ofxTableViewCellStyle          cellStyle;
 
-    bool            myState;
+    bool            drawsModalChild = false;
     
+    bool            myState;
+   
     float           floatValue;
     float           minValue;
     float           maxValue;

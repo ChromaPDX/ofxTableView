@@ -42,12 +42,25 @@ void ofxTableView::initWithParent(ofxScrollView *nparent, frame3d frame) {
     
 }
 
-ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
+ofxTableViewCell*    ofxTableView::addCellWithLabel(string label, float autoSizePct)
+{
+    
+    ofxTableViewCell *newCell = addCellWithStyle(ofxTableViewCellStyleText, autoSizePct);
+    
+    newCell->setString(label);
+    
+    return newCell;
+    
+}
+
+ofxTableViewCell*    ofxTableView::addCellWithStyle(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
 {
     
     ofxTableViewCell *newCell = new ofxTableViewCell;
     
     newCell->initWithParent(this, ncellStyle, nautoSizePct);
+    
+    addChild(newCell);
     
     addDataSourceForCell(newCell);
     
@@ -55,9 +68,13 @@ ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, flo
 
 }
 
+
+
 void  ofxTableView::addCustomCell(ofxTableViewCell *newCell, float autoSizePct){
     
     newCell->initWithParent(this, ofxTableViewCellStyleCustom, autoSizePct);
+    
+    addChild(newCell);
     
     addDataSourceForCell(newCell);
     
@@ -70,9 +87,12 @@ ofxTableView*    ofxTableView::addTable(float nautoSizePct)
     
     nestedTable->initWithParent(this, nautoSizePct);
     
+    addChild(nestedTable);
+    
     dictionary[nestedTable->referenceId] = nestedTable->dictionary;
     
     nestedTable->scrollDirectionVertical = false;
+    
     
     return nestedTable;
     
@@ -90,7 +110,7 @@ void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
 
     }
     
-    else if (cell->cellStyle == ofxTableViewCellStyleGraph || cell->cellStyle == ofxTableViewCellStyleScroll || cell->cellStyle == ofxTableViewCellStyleContainer) {
+    else if (cell->cellStyle == ofxTableViewCellStyleGraph || cell->cellStyle == ofxTableViewCellStyleScroll || cell->cellStyle == ofxTableViewCellStyleContainer || cell->cellStyle == ofxTableViewCellStyleModal) {
         
         dictionary[cell->referenceId]["array"].init_array();
         

@@ -67,9 +67,9 @@ public:
     
     ofxTableViewDelegate *delegate = NULL;
     
-    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    ofxTableViewCell* addCellWithLabel(string label, float autoSizePct);
+    ofxTableViewCell* addCellWithStyle(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
     void addCustomCell(ofxTableViewCell *custom, float autoSizePct);
-    
     ofxTableView* addTable(float nautoSizePct);
     
     // @OVERRIDE FROM BASE CLASS

@@ -32,6 +32,7 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     ofxTableViewController *vc;
     ofxTableView *tbv;
+    ofxTableView *modalTable;
     
     float rot;
     float spin;
