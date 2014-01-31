@@ -255,6 +255,8 @@ public:
     void                    removeChild(ofxScrollView* child);
     bool                    hasChild(ofxScrollView* child);
 
+    bool                    debugUI = false;
+    
     ofxScrollView * _modalParent = NULL;
     ofxScrollView * _modalChild = NULL;
     

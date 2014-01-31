@@ -7,31 +7,25 @@ public:
     
     float xspin = 0;
     
-    void draw(ofRectangle rect){
+    void draw(){
         
-        ofxScrollView::begin();
+            ofxScrollView::begin();
+            
+            ofSetColorf(fgColor);
+            
+            ofFill();
+            ofDrawCone(0,0, getWidth()/2., getHeight());
+            
+            float stroke[4] = {0,0,0,.8};
+            
+            ofSetColorf(stroke);
+            ofNoFill();
+            
+            ofDrawCone(0,0, getWidth()/2., getHeight());
         
+            
+            ofxScrollView::end();
 
-        
-        ofPushMatrix();
-        
-        ofRotate(xspin, 1, 0, 0);
-       
-        ofSetColorf(fgColor);
-        ofFill();
-        ofDrawCone(0,0, rect.height/2., rect.height);
-        
-        float stroke[4] = {0,0,0,.8};
-        
-        ofSetColorf(stroke);
-        ofNoFill();
-        ofDrawCone(0,0, rect.height/2., rect.height);
-        
-        ofPopMatrix();
-        
-        
-        ofxScrollView::end();
-        
     }
     
     void update(){
@@ -55,24 +49,27 @@ int dir;
 void testApp::setup(){	
 
 
+    glEnable(GL_DEPTH_TEST);
     
     
     vc = new ofxTableViewController;
     
     tbv = vc->addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
     
-    //tbv->setFgColor(ofColor(0,100,10,255));
+    tbv->setFgColor(ofColor(255));
     tbv->setBgColor(ofColor(0,100,200,100));
     
-    ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
 
-    ofxTableViewCell *header = scroller->addCell(ofxTableViewCellStyleText, .5);
     
-    header->setString("HELLO !");
+    ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
     
     ofxTableViewCell *image = scroller->addCell(ofxTableViewCellStylePicture, .5);
     
     image->setImageFromDisk("Icon@2x.png");
+    
+    ofxTableViewCell *header = scroller->addCell(ofxTableViewCellStyleText, .5);
+    
+    header->setString(string("HELLO !!!"));
 
     
     for (int i = 0; i < 10; i++){
@@ -133,9 +130,8 @@ void testApp::update(){
 void testApp::draw(){
     ofPushMatrix();
     
-        ofTranslate(ofGetWidth()/2., 0);
+        ofTranslate(ofGetWidth()/2., ofGetHeight()/2.);
         glRotatef(rot, 0, 1, 0);
-        ofTranslate(-ofGetWidth()/2., 0);
     
     vc->draw();
     

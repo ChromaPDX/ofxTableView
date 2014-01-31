@@ -151,7 +151,7 @@ void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
         
         dictionary[cell->referenceId]["text"] = "default";
         
-        cell->dataSource = &dictionary[cell->referenceId];
+        cell->dataSource = &dictionary[cell->referenceId]["text"];
         
     }
     
@@ -165,7 +165,9 @@ void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
     
     else if (cell->cellStyle == ofxTableViewCellStyleScroll) {
         
-        NSLog(@"no duplicate nesting of scrollers!!!!");
+        dictionary[cell->referenceId]["array"].init_array();
+        
+        cell->dataSource = &dictionary[cell->referenceId]["array"];
         
     }
     

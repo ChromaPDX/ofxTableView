@@ -562,19 +562,19 @@ void ofxScrollView::update() {
 #pragma mark - ofx DRAW
 
 void ofxScrollView::begin() {
-    
-
    
-    
+    if  (debugUI){
+        ofSetColor(255,0,0,255);
+        ofDrawSphere(getPosition(), 10);
+    }
 
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
     {
         
-        ofSetColor(255,0,0,255);
-        
-        ofDrawSphere(getPosition(), 10);
-        
+
         ofRectangle d = getDrawFrame();
+        
+        
         
         if (shouldRasterize){
             
@@ -654,13 +654,17 @@ void ofxScrollView::end() {
             if (getRoot()->_modalChild) {
                 if (getRoot()->_modalChild != children[i]) {
                     setChildFrame(children[i]);
+                    if (!children[i]->hidden) {
                     children[i]->draw();
+                    }
                 }
             }
             
             else {
                 setChildFrame(children[i]);
-                children[i]->draw();
+                if (!children[i]->hidden) {
+                    children[i]->draw();
+                }
             }
             
         }
