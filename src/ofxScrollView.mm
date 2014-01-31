@@ -912,6 +912,10 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
     
     
     
+    
+    
+    
+    
 }
 
 frame3d ofxScrollView::getFrame() {
