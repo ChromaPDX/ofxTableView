@@ -23,6 +23,12 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
     
     setFrame(frame);
 
+#pragma mark - INIT + Children
+
+void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
+    
+    setFrame(frame);
+
     if (parent){
         
         setParent(parent);
@@ -114,7 +120,16 @@ void ofxScrollView::removeChild(ofxScrollView* child){
         }
     }
     
+    NSLog(@"Starting Animation");
+    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+    
+    animations.push_back(currentAnimation);
+    child->animations.push_back(childAnimation);
+    
+    child->setParent(NULL);
 
+    
 }
 
 bool ofxScrollView::hasChild(ofxScrollView* child){
@@ -158,6 +173,16 @@ void ofxScrollView::setParent(ofxScrollView *parent){
     else {
         ofNode::clearParent();
     }
+    if (child->animations.size()) {
+        childAnimation->sourceFrame = child->animations[child->animations.size()-1]->destFrame;
+    }
+    
+    NSLog(@"Starting Animation");
+    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+    
+    animations.push_back(currentAnimation);
+    child->animations.push_back(childAnimation);
     
 }
 
@@ -185,8 +210,15 @@ ofNode* ofxScrollView::getParent(){
 
 void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, float durationSec){
     
+    return frame3d(weightedAverage(src.x, dst.x, d),
+                       weightedAverage(src.y, dst.y, d),
+                       weightedAverage(src.z, dst.z, d),
+                       weightedAverage(src.w, dst.w, d),
+                       weightedAverage(src.h, dst.h, d));
     
+}
 
+void ofxScrollView::updateAnimation(ofxScrollViewAnimation *anim) {
     
     _modalChild = child;
     child->_modalParent = this;
@@ -905,11 +937,16 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
         v->hidden = v->scrollShouldCull();
 
         
+        
+        return v->getFrame();
+        
     }
 
     
     
-    
+    else {
+        return v->getFrame();
+    }
     
     
     

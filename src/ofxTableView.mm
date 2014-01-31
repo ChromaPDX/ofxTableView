@@ -137,11 +137,6 @@ void ofxTableView::draw(){
 
     
     if (_modalChild) {
-        ((ofxTableView*)_modalChild)->draw();
-    }
-
-    
-    if (_modalChild) {
         _modalChild->setOrientation(getOrientationQuat());
         
         ((ofxTableView*)_modalChild)->draw();

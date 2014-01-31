@@ -248,8 +248,7 @@ public:
     void                    popModalView(TransitionStyle transitionStyle,float durationSec);
     void                    updateAnimation(ofxScrollViewAnimation *anim);
     
-    ofNode*                 getParent();
-    
+    ofxScrollView*          getParent();
     ofxScrollView*          getRoot();
     
     void                    removeChild(ofxScrollView* child);
