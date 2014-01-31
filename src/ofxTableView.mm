@@ -18,7 +18,7 @@ ofxTableView::~ofxTableView()//destructor
 
 #pragma mark - @OVERRIDE
 
-void ofxTableView::initWithParent(ofxScrollView *nparent, ofRectangle frame) {
+void ofxTableView::initWithParent(ofxScrollView *nparent, frame3d frame) {
     
     ofxScrollView::initWithParent(nparent, frame);
 
@@ -36,12 +36,12 @@ void ofxTableView::initWithParent(ofxScrollView *nparent, ofRectangle frame) {
     
 }
 
-ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, float nheightPct)
+ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
 {
     
     ofxTableViewCell *newCell = new ofxTableViewCell;
     
-    newCell->initWithParent(this, ncellStyle, nheightPct);
+    newCell->initWithParent(this, ncellStyle, nautoSizePct);
     
     addChild(newCell);
     
@@ -49,62 +49,6 @@ ofxTableViewCell*    ofxTableView::addCell(ofxTableViewCellStyle ncellStyle, flo
     
     return newCell;
 
-}
-
-bool     ofxTableView::containsPoint(int x, int y) //check to see if mouse is within boundaries of object.
-{
-    
-    int lx = x;
-    int ly = y;
-    
-    bool withinArea = false;
-    if ( lx > frame.x && lx < frame.x + frame.width && ly > frame.y && ly < frame.y + frame.height)
-    {
-        withinArea = true;
-    }
-    return withinArea;
-}
-
-ofRectangle  ofxTableView::getChildRect(ofxScrollView *v){
-    
-    if (fdirty) {
-
-            
-            int tempSize = 0;
-            for(int i = 0; i < v->referenceId; i++)
-            {
-                int temp = children[i]->getHeight();
-                tempSize += temp + verticalPadding;
-            }
-            
-        
-        if (clipToBounds){
-            v->setFrame(ofRectangle((horizontalPadding / 2.),
-                                    tempSize + scrollPosition,
-                                    bounds.width-(horizontalPadding),
-                                    bounds.height * v->heightPct
-                                    ));
-            
-        }
-        else {
-            v->setFrame(ofRectangle(frame.x+(horizontalPadding / 2.),
-                                    frame.y+tempSize + scrollPosition,
-                                    bounds.width-(horizontalPadding),
-                                    bounds.height * v->heightPct
-                                    ));
-        }
-            v->hidden = v->scrollShouldCull();
-            
-          
-            return v->getFrame();
-        
-    }
-    
-    else {
-        return v->getFrame();
-    }
-    
-    
 }
 
 
@@ -146,12 +90,15 @@ void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
 
 void ofxTableView::draw(){
     
+
     
     if (!raster.isAllocated()) {
         raster.allocate(bounds.width, bounds.height);
     }
     
     ofEnableAlphaBlending();
+    
+  
     
     if (clipToBounds) {
         
@@ -160,36 +107,45 @@ void ofxTableView::draw(){
         ofClear(0,0,0,255);
         
         
-        ofxScrollView::begin(bounds);
+        ofxScrollView::begin();
         
         // CUSTOM DRAW CODE
         
-        ofxScrollView::end(bounds);
+        ofxScrollView::end();
         
         
         raster.end();
         
-        raster.draw(frame.x, frame.y);
+        raster.draw(bounds.x, bounds.y);
         
     }
     
     else {
         
             
-            ofxScrollView::begin(frame);
+            ofxScrollView::begin();
             
             // CUSTOM DRAW CODE
+        
+            //NSLog(@"drawLocation: P: %f %f %f S: %f %f", getX(), getY(),getZ(),getWidth(),getHeight());
+        
             
-            ofxScrollView::end(frame);
+            ofxScrollView::end();
             
         
     }
+
+    
+    if (_modalChild) {
+        ((ofxTableView*)_modalChild)->draw();
+    }
+
     
 //    glDisable(GL_BLEND);
 //    glColorMask(0, 0, 0, 1);
 //    glColor4f(1,1,1,1.0f);
 //    
-//    ofRect(frame);
+//    ofRect(bounds);
 //    
 //    glColorMask(1,1,1,0);
 //    

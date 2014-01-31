@@ -34,6 +34,7 @@
 //--------------------------------------------------------------
 #include "ofMain.h"
 #include "ofxMultiTouch.h"
+#include "ofxScrollView.h"
 
 class ofxTableView;
 
@@ -61,7 +62,7 @@ public:
     void            draw(int x, int y);
     
     vector          <ofxTableView*> tableViews;
-    ofxTableView* addTableView(int x,int y,int w, int h);
+    ofxTableView* addTableView(frame3d frame);
     
     void update();
     

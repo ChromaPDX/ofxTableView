@@ -16,18 +16,19 @@ ofxScrollView::~ ofxScrollView()//destructor
     
 }
 
-
+void logFrame(frame3d frame){
+    NSLog(@"FRAME3D :: %f %f %f :: %f %f", frame.x, frame.y, frame.z, frame.w, frame.h);
+}
 
 #pragma mark - INIT + Children
 
-void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
+void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
     
-    bounds = ofRectangle(0,0,nframe.width,nframe.height);
-    frame = ofRectangle(nframe);
-    
+    setFrame(frame);
+
     if (parent){
         
-        _parent = parent;
+        setParent(parent);
         
         horizontalPadding = 20;
         verticalPadding = 0;
@@ -47,6 +48,7 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
     
     else {
         
+        
         localTint = 1.;
         sharedTint = &localTint;
         
@@ -58,8 +60,12 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, ofRectangle nframe){
         
         setFgColor(ofColor(255));
         
-        _xRootOffset = nframe.x;
-        _yRootOffset = nframe.y;
+        float nbgColor[4] = {rand()%255/255., rand()%255/255.,rand()%255/255.,1.};
+        
+        setBgColor(nbgColor);
+        
+        _xRootOffset = getX();
+        _yRootOffset = getY();
         
         xTouchOffset = &_xRootOffset;
         yTouchOffset = &_yRootOffset;
@@ -84,6 +90,19 @@ void ofxScrollView::addChild(ofxScrollView *child){
     
 }
 
+void ofxScrollView::setParent(ofxScrollView *parent){
+    
+    if (parent) {
+        ofNode::setParent(*_parent);
+    }
+    else {
+        ofNode::clearParent();
+    }
+    
+    _parent = parent;
+    
+    
+}
 ofxScrollView* ofxScrollView::getRoot(){
     
     if (_modalParent){
@@ -114,9 +133,8 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     
     _modalChild = child;
     child->_modalParent = this;
-    
+
     // Create My Transition Object
-    
     
     ofxScrollViewAnimation* currentAnimation = new ofxScrollViewAnimation;
     
@@ -137,32 +155,59 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     childAnimation->duration = durationSec * 1000;
     childAnimation->startTime = ofGetElapsedTimeMillis();
     childAnimation->style = style;
-    childAnimation->sourceFrame = ofRectangle(frame.x+frame.width, frame.y, frame.width, frame.height);
+    
+    
+    
+    child->hidden = false;
+    
+    childAnimation->destFrame = getFrame();
     
     switch (style) {
+            
         case TransitionStyleNone:
             
             break;
             
         case TransitionStyleExitToLeft:
             
-            currentAnimation->destFrame = ofRectangle(frame.x-frame.width, frame.y, frame.width, frame.height);
+            childAnimation->sourceFrame = frame3d(bounds.x+bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            
+            currentAnimation->destFrame = frame3d(bounds.x-bounds.width, bounds.y,getZ(), bounds.width, bounds.height);
             childAnimation->style = TransitionStyleEnterFromRight;
-            childAnimation->destFrame = getFrame();
+            
             
             child->hidden = false;
-            
+
             break;
             
         case TransitionStyleExitToRight:
             
-            currentAnimation->destFrame = ofRectangle(frame.x+frame.width, frame.y, frame.width, frame.height);
+            childAnimation->sourceFrame = frame3d(bounds.x-bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            
+            currentAnimation->destFrame = frame3d(bounds.x+bounds.width, bounds.y, getZ(), bounds.width, bounds.height);
             childAnimation->style = TransitionStyleEnterFromLeft;
-            childAnimation->destFrame = getFrame();
+
+            break;
+            
+        case TransitionStyleZoomIn:
             
             child->hidden = false;
             
+            
+            
+            childAnimation->sourceFrame = frame3d(child->getGlobalPosition(), child->bounds);
+            
+            logFrame(frame3d(child->getGlobalPosition(), child->bounds));
+            
+            _modalChild->cachedFrame = childAnimation->sourceFrame;
+            
+            currentAnimation->destFrame = frame3d(getX(), getY(), getZ()+1000, bounds.width,bounds.height);
+            
+            childAnimation->style = TransitionStyleZoomOut;
+            
+            
             break;
+            
             
             
         default:
@@ -170,17 +215,22 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     }
     
     NSLog(@"Starting Animation");
-    NSLog(@"target frame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.width,currentAnimation->destFrame.height);
-    NSLog(@"child target frame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.width,childAnimation->destFrame.height);
+    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
+    
+    child->setParent(NULL);
+
     
 }
 
 void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
     
     ofxScrollView *child = _modalChild;
+    
+    _modalChild->_modalParent = NULL;
     
     // Create My Transition Object
     
@@ -212,11 +262,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromLeft:
             
-            currentAnimation->destFrame = ofRectangle(frame.x+frame.width, frame.y, frame.width, frame.height);
+            currentAnimation->destFrame = frame3d(getX()+bounds.width, getY(), getZ(), bounds.width, bounds.height);
             
             childAnimation->style = TransitionStyleExitToRight;
             
-            childAnimation->destFrame = ofRectangle(child->getFrame().x+child->getFrame().width, child->getFrame().y, child->getFrame().width, child->getFrame().height);
+            childAnimation->destFrame = frame3d(child->getX()+child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
             
@@ -224,13 +274,27 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromRight:
             
-            currentAnimation->destFrame = ofRectangle(frame.x-frame.width, frame.y, frame.width, frame.height);
+            currentAnimation->destFrame = frame3d(getX()-bounds.width, getY(), getZ(), bounds.width, bounds.height);
             
             childAnimation->style = TransitionStyleExitToLeft;
             
-            childAnimation->destFrame = ofRectangle(child->getFrame().x-child->getFrame().width, child->getFrame().y, child->getFrame().width, child->getFrame().height);
+            childAnimation->destFrame = frame3d(child->getX()-child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
+            
+            break;
+            
+        case TransitionStyleZoomOut:
+            
+            hidden=false;
+            
+            //_modalChild->cachedFrame = _modalChild->getFrame();
+            
+            currentAnimation->destFrame = frame3d(getX(), getY(), 0, bounds.width,bounds.height);
+            
+            childAnimation->destFrame = _modalChild->cachedFrame;
+            
+            childAnimation->style = TransitionStyleEnterFromLeft;
             
             break;
             
@@ -238,15 +302,22 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             break;
     }
     
-    NSLog(@"Starting Animation");
-    NSLog(@"target frame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.width,currentAnimation->destFrame.height);
-    NSLog(@"child target frame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.width,childAnimation->destFrame.height);
+    if (animations.size()) {
+        currentAnimation->sourceFrame = animations[animations.size()-1]->destFrame;
+    }
+    if (child->animations.size()) {
+        childAnimation->sourceFrame = child->animations[child->animations.size()-1]->destFrame;
+    }
     
+    NSLog(@"Starting Animation");
+    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
     
 }
+
 
 inline float weightedAverage (float src, float dst, float d){
     
@@ -260,12 +331,13 @@ inline float logAverage (float src, float dst, float d){
     
 }
 
-inline ofRectangle getTweenFrame(ofRectangle src, ofRectangle dst, float d){
+inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
     
-    return ofRectangle(weightedAverage(src.x, dst.x, d),
+    return frame3d(weightedAverage(src.x, dst.x, d),
                        weightedAverage(src.y, dst.y, d),
-                       weightedAverage(src.width, dst.width, d),
-                       weightedAverage(src.height, dst.height, d));
+                       weightedAverage(src.z, dst.z, d),
+                       weightedAverage(src.w, dst.w, d),
+                       weightedAverage(src.h, dst.h, d));
     
 }
 
@@ -277,11 +349,18 @@ void ofxScrollView::updateAnimation(ofxScrollViewAnimation *anim) {
     //NSLog(@"update %f completion", anim->completion);
     
     switch (anim->style) {
+            
         case TransitionStyleNone:
             
             break;
             
         case TransitionStyleEnterFromRight: case TransitionStyleEnterFromLeft: case TransitionStyleExitToLeft: case TransitionStyleExitToRight:
+            
+            setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
+            
+            break;
+            
+        case TransitionStyleZoomIn: case TransitionStyleZoomOut:
             
             setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
             
@@ -298,14 +377,16 @@ void ofxScrollView::updateAnimation(ofxScrollViewAnimation *anim) {
         
         setFrame(anim->destFrame);
         
-        if (anim->style == TransitionStyleExitToLeft || anim->style == TransitionStyleExitToRight) {
+        if (anim->style == TransitionStyleExitToLeft || anim->style == TransitionStyleExitToRight || anim->style == TransitionStyleZoomIn) {
             hidden = true;
         }
         
-        if (anim->style == TransitionStyleEnterFromLeft || anim->style == TransitionStyleEnterFromRight) {
+        if (anim->style == TransitionStyleEnterFromLeft || anim->style == TransitionStyleEnterFromRight || anim->style == TransitionStyleZoomOut) {
             if (_modalChild) {
                 
-                _modalChild->hidden = true;
+                //_modalChild->hidden = true;
+                
+                _modalChild->setParent(this);
                 
                 _modalChild->_modalParent = NULL;
                 _modalChild = NULL;
@@ -420,61 +501,66 @@ void ofxScrollView::update() {
 
 #pragma mark - ofx DRAW
 
-void ofxScrollView::begin(ofRectangle rect) {
+void ofxScrollView::begin() {
     
-    if (!_parent) {
-        //  ofEnableAlphaBlending();
-    }
+
+   
     
+
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
     {
+        
+        ofSetColor(255,0,0,255);
+        
+        ofDrawSphere(getPosition(), 10);
+        
+        ofRectangle d = getDrawFrame();
         
         if (shouldRasterize){
             
             if (!raster.isAllocated()) {
-                raster.allocate(rect.width, rect.height);
+                raster.allocate(bounds.width, bounds.height);
             }
             raster.begin();
             
         }
         
-        if (bgImage.isAllocated()) {
-            bgImage.draw(rect);
-            
-            //            if (highlighted) {
-            //                ofFill();
-            //                ofSetColor(255,255,255,50);
-            //                ofRect(rect);
-            //            }
+        else {
+            ofPushMatrix();
+            ofMultMatrix( getLocalTransformMatrix() );
         }
         
-        else if (bgColor[3] != 0){
+        if (bgImage.isAllocated() || bgColor[3] > 0) {
             
             ofFill();
-            
-            //            if (highlighted) {
-            //                float tempColor[4] = {bgColor[0]+.2, bgColor[1]+.2, bgColor[2]+.2, bgColor[3]+.2};
-            //                ofSetColorf(tempColor);
-            //            }
             ofSetColorf(bgColor);
-            ofRect(rect);
+            
+            ofRect(d.x, d.y, d.width, d.height);
+            
+            if (bgImage.isAllocated()) {
+                
+                ofSetColor(255);
+                
+                bgImage.draw(d.x, d.y, d.width, d.height);
+                
+            }
+            
+            
             
         }
         
-        if (drawsName) {
-            ofSetColorf(fgColor);
-            sharedFont->drawString(displayName, rect.x + rect.width - sharedFont->stringWidth(displayName), rect.y + sharedFont->stringHeight(displayName));
-        }
+
         
         
         
     }
     
-
+    
+    
     
 }
 
-void     ofxScrollView::draw(ofRectangle rect)
+void     ofxScrollView::draw()
 {
     
     /*
@@ -493,22 +579,28 @@ void     ofxScrollView::draw(ofRectangle rect)
     
 }
 
-void ofxScrollView::end(ofRectangle rect) {
+void ofxScrollView::end() {
     
+   
     
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
     {
+        
+        ofRectangle d = getDrawFrame();
         
         for(int i = 0; i < children.size(); i++)
         {
             
             if (getRoot()->_modalChild) {
                 if (getRoot()->_modalChild != children[i]) {
-                    children[i]->draw(getChildRect(children[i]));
+                    getChildFrame(children[i]);
+                    children[i]->draw();
                 }
             }
+            
             else {
-                children[i]->draw(getChildRect(children[i]));
+                getChildFrame(children[i]);
+                children[i]->draw();
             }
             
         }
@@ -519,32 +611,39 @@ void ofxScrollView::end(ofRectangle rect) {
             ofSetColorf(fgColor);
             ofSetLineWidth(2*getScreenScale());
             
-            ofRect(rect);
+            ofRect(d);
         }
         
         
         if (shouldRasterize) {
-            
+        
             raster.end();
-            raster.draw(frame.x, frame.y);
+            
+            ofPushMatrix();
+            ofMultMatrix( getLocalTransformMatrix() );
+            
+            raster.draw(d.x, d.y);
             
         }
+        
+        
         
         if (highlighted) {
             ofEnableBlendMode(OF_BLENDMODE_ADD);
             ofFill();
             ofSetColor(255,255,255,100);
-            ofRect(rect);
+            ofRect(d);
             ofEnableBlendMode(OF_BLENDMODE_ALPHA);
         }
         
         dirty = false;
         fdirty = false;
+        
+        ofPopMatrix();
+        
     }
     
-    if (_modalChild) {
-        ((ofxTableView*)_modalChild)->draw();
-    }
+    
     
 }
 
@@ -568,9 +667,9 @@ float ofxScrollView::outOfBounds(){
         
         else {
             
-            if (getContentSize() > frame.height) {
+            if (getContentSize() > bounds.height) {
                 
-                int diff = scrollPosition + getContentSize() - frame.height;
+                int diff = scrollPosition + getContentSize() - bounds.height;
                 if (diff < 0){
                     
                     return diff;
@@ -596,9 +695,9 @@ float ofxScrollView::outOfBounds(){
         
         else {
             
-            if (getContentSize() > frame.width) {
+            if (getContentSize() > bounds.width) {
                 
-                int diff = scrollPosition + getContentSize() - frame.width;
+                int diff = scrollPosition + getContentSize() - bounds.width;
                 
                 if (diff < 0){
                     
@@ -628,18 +727,14 @@ bool ofxScrollView::scrollShouldCull() {
         
         if (_parent->scrollingEnabled) {
             
-            if (_parent->scrollDirectionVertical && (frame.y + frame.height < _parent->getFrame().y || frame.y > _parent->getFrame().y + _parent->getHeight())) {
+            if (_parent->scrollDirectionVertical && (getY() + bounds.height/2. < _parent->getDrawFrame().y || getY() - bounds.height/2. > _parent->getDrawFrame().y + _parent->getHeight())) {
                 return true;
             }
             
-            else if (frame.x + frame.width < _parent->getFrame().x || frame.x > _parent->getFrame().x + _parent->getWidth()) {
+            else if (getX() + bounds.width < _parent->getDrawFrame().x || getX() > _parent->getDrawFrame().x + _parent->getWidth()) {
                 return true;
             }
-            
-            //            else if (_parent->hidden == false) {
-            //                hidden = false;
-            //            }
-            //
+
         }
         
     }
@@ -647,12 +742,18 @@ bool ofxScrollView::scrollShouldCull() {
     return false;
 }
 
+ofVec3f ofxScrollView::getCenter(){
+
+    return ofVec3f(getX()-bounds.width/2., getY()-bounds.height/2., getZ());
+    
+}
+
 int  ofxScrollView::getHeight() {
-    return frame.height;
+    return bounds.height;
 }
 
 int  ofxScrollView::getWidth() {
-    return frame.width;
+    return bounds.width;
 }
 
 int ofxScrollView::getContentSize(){
@@ -695,13 +796,11 @@ void ofxScrollView::setScrollPostion(int offset, bool animated){
 }
 
 
-ofRectangle  ofxScrollView::getChildRect(ofxScrollView *v){
+
+frame3d  ofxScrollView::getChildFrame(ofxScrollView *v){
     
     if (fdirty) {
         
-        v->fdirty = true;
-        
-        //   NSLog(@"rasterizing!!");
         
         if (scrollDirectionVertical){
             
@@ -712,16 +811,14 @@ ofRectangle  ofxScrollView::getChildRect(ofxScrollView *v){
                 tempSize += temp + verticalPadding;
             }
             
+            float childSize = bounds.height * v->autoSizePct;
             
-            v->frame = ofRectangle(frame.x + (horizontalPadding / 2.),
-                                   frame.y + tempSize + scrollPosition,
-                                   frame.width-(horizontalPadding),
-                                   frame.height * v->heightPct
-                                   );
-            
-            v->hidden = v->scrollShouldCull();
-            
-            return v->frame;
+            v->setFrame(frame3d((horizontalPadding / 2.),
+                                -bounds.height/2. + tempSize + scrollPosition + childSize/2.,
+                                0,
+                                bounds.width-(horizontalPadding),
+                                childSize
+                                ));
             
         }
         
@@ -735,88 +832,120 @@ ofRectangle  ofxScrollView::getChildRect(ofxScrollView *v){
                 tempSize += temp + horizontalPadding;
             }
             
-            v->frame = ofRectangle(frame.x + tempSize + scrollPosition,
-                                   frame.y + (verticalPadding/2.),
-                                   frame.width * v->widthPct,
-                                   frame.height - verticalPadding);
+            float childSize = bounds.width * v->autoSizePct;
             
-            v->hidden = v->scrollShouldCull();
-            
-            return v->frame;
-            
+            v->setFrame(frame3d(-bounds.width/2. + tempSize + scrollPosition + childSize/2.,
+                                (verticalPadding/2.),
+                                0,
+                                childSize,
+                                bounds.height - verticalPadding));
         }
+        
+        
+        v->hidden = v->scrollShouldCull();
+        
+        
+        return v->getFrame();
         
     }
     
+    
     else {
-        return v->frame;
+        return v->getFrame();
     }
     
     
-}
-
-ofRectangle ofxScrollView::getFrame() {
     
-    return ofRectangle(frame);
+    
+    
     
 }
 
-void ofxScrollView::setFrame(ofRectangle nframe){
+frame3d ofxScrollView::getFrame() {
     
-    if (frame.height != nframe.height || frame.width != nframe.width) { // SCALED, refresh content size
+    return frame3d(getPosition(), bounds);
+    
+}
+
+ofRectangle ofxScrollView::getDrawFrame(){
+    return ofRectangle(-getWidth()/2, -getHeight()/2., getWidth(), getHeight());
+}
+
+
+void ofxScrollView::setFrame(frame3d frame){
+    
+    if (bounds.height != frame.h || bounds.width != frame.w) { // SCALED, refresh content size
         cdirty = true;
     }
+    
+    setPosition(frame.x, frame.y, frame.z);
+    
+    bounds = frame.getBounds();
     
     fdirty = true;
     
-    frame = ofRectangle(nframe);
-    bounds = ofRectangle(0, 0, nframe.width, nframe.height);
+    //setPosition(nbounds.x + nbounds.width/2., nbounds.y+nbounds.height/2, getZ());
+    
+   
 
 }
 
-ofRectangle ofxScrollView::getParentRect(){
-    
-    return ofRectangle(_parent->getFrame());
-    
-}
 
 void ofxScrollView::scaleFrame(float scale){
     
-    if (_scale != scale){
-        
-        fdirty = true;
-        cdirty = true;
-        
-        float dScale = (scale - _scale);
-        
-        float rScale = 1 + dScale;
-        
-        bounds = ofRectangle(0,0,bounds.width * rScale,bounds.height * rScale);
-        
-        setFrame(ofRectangle(frame.x, frame.y, bounds.width, bounds.height));
-        
-        _xRootOffset = frame.x;
-        _yRootOffset = frame.y;
-        
-        _scale += dScale;
-        
-        raster.allocate(bounds.width, bounds.height);
-        
-        NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
-        
-    }
+   // setScale(scale, scale, scale);
     
+//    if (_scale != scale){
+//        
+//        fdirty = true;
+//        cdirty = true;
+//        
+//        float dScale = (scale - _scale);
+//        
+//        float rScale = 1 + dScale;
+//        
+//        bounds = ofRectangle(0,0,bounds.width * rScale,bounds.height * rScale);
+//        
+//        setFrame(ofRectangle(bounds.x, bounds.y, bounds.width, bounds.height));
+//        
+//        _xRootOffset = bounds.x;
+//        _yRootOffset = bounds.y;
+//        
+//        _scale += dScale;
+//        
+//        raster.allocate(bounds.width, bounds.height);
+//        
+//        NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
+//        
+//    }
+    
+}
+
+ofRectangle     ofxScrollView::getWorldFrame(){
+    
+    ofPoint g = getGlobalPosition();
+
+    return ofRectangle(g.x - bounds.width/2.,g.y-bounds.height/2., bounds.width, bounds.height);
+        
 }
 
 bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is within boundaries of object.
 {
     
-    int lx = x - *xTouchOffset;
-    int ly = y - *yTouchOffset;
+    
+    ofRectangle d = getWorldFrame();
+    
+    float lx = x - ofGetWidth()/2.;
+    
+    float ly = y - ofGetHeight()/2.;
+
+    NSLog(@"contains point ? %f %f", lx, ly);
     
     bool withinArea = false;
-    if ( lx > frame.x && lx < frame.x + frame.width && ly > frame.y && ly < frame.y + frame.height)
+    if ( lx > d.x && lx < d.x + d.width && ly > d.y && ly < d.y + d.height)
     {
+        
+        NSLog(@"in rect %f %f %f %f",d.x-bounds.width/2.,d.y-bounds.height/2., bounds.width, bounds.height);
         withinArea = true;
     }
     return withinArea;

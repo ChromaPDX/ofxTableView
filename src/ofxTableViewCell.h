@@ -67,20 +67,18 @@ public:
     
     //METHODS:--------------------------------------------------------
     
-    void initWithParent(ofxTableView *nparent, ofxTableViewCellStyle cellStyle, float heightPct);
-    void initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nwidthPct);
-    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nWidthPct);
-    void addCustomCell(ofxTableViewCell* custom, float nWidthPct);
+    void initWithParent(ofxTableView *nparent, ofxTableViewCellStyle cellStyle, float autoSizePct);
+    void initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    ofxTableViewCell* addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct);
+    void addCustomCell(ofxTableViewCell* custom, float nautoSizePct);
     
     void initStyle(ofxTableViewCellStyle cellStyle);
 
     
-    ofRectangle     getChildRect(ofxScrollView *v);
-    void            draw(ofRectangle rect);
+    void            draw();
     
     // DRAW STYLES
     
-    void            drawSlider(ofRectangle rect);
 
     // SUB VIEWS
     void addCell    (ofxTableViewCell *cell);
