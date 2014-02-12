@@ -1,5 +1,8 @@
 #include "testApp.h"
 
+
+// HERE IS AN EXAMPLE SUBCLASS OF A TABLE VIEW CELL
+
 class myCustomCell : public ofxTableViewCell {
     
 public:
@@ -34,76 +37,102 @@ public:
     
 };
 
-
-// VARIABLES
-
-ofxTableViewController *vc;
-ofxTableView *tbv;
-myCustomCell myCell;
-float rot;
-float spin;
-int dir;
-
 //--------------------------------------------------------------
 void testApp::setup(){	
 
-
-    glEnable(GL_DEPTH_TEST);
     
+    // INIT VIEW CONTROLLER, HANDLES TOUCHES
     
     vc = new ofxTableViewController;
     
-    tbv = vc->addTableView(frame3d(0,0,0,ofGetWidth(), ofGetHeight()));
+    // add a tableview
+    
+    tbv = vc->addTableView();  // or vc->addTableView(x,y,z,w,h);
+    
+    // SET testApp as Delegate to receive cell callbacks
     
     tbv->delegate = this;
+    
+    // SET color scheme, root draws bg color, cells inherit fgcolor
     
     tbv->setFgColor(ofColor(255));
     tbv->setBgColor(ofColor(0,100,200,100));
     
-
+    // CELLS
     
-    ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25);
+    // 1 // SIMPLE HEADER
     
-    ofxTableViewCell *image = scroller->addCell(ofxTableViewCellStylePicture, .5);
+    tbv->addCellWithLabel("ofxTableView Header", .125);
+    
+    // 2 // CONTAINER CELL FOR HORIZONTAL SPLIT
+    
+    ofxTableViewCell *containerCell = tbv->addCellWithStyle(ofxTableViewCellStyleContainer, .25);
+    
+    ofxTableViewCell *label = containerCell->addCellWithStyle(ofxTableViewCellStyleText, .5);
+    
+    label->setString(string("Split view"));
+    
+    ofxTableViewCell *image = containerCell->addCellWithStyle(ofxTableViewCellStylePicture, .5);
     
     image->setImageFromDisk("Icon@2x.png");
     
-    ofxTableViewCell *header = scroller->addCell(ofxTableViewCellStyleText, .5);
-    
-    header->setString(string("HELLO !!!"));
+    // 3 // NESTED TABLE
 
+    ofxTableViewCell *text = tbv->addCellWithStyle(ofxTableViewCellStyleText, .125);
+    text->setString("NESTED TABLE");
     
-    for (int i = 0; i < 10; i++){
+    ofxTableView *nestedTable = tbv->addTable(.5);
+    
+    for (int i = 0; i < 10 + 1; i++) {
         
-        float scale = random() %2 + 1;
+        ofxTableViewCell *picture = nestedTable->addCellWithStyle(ofxTableViewCellStylePicture, .33);
         
-        if (scale > 1){
-        ofxTableViewCell *text = tbv->addCell(ofxTableViewCellStyleText, .125);
-        text->setString("OFX TABLE VIEW !!!");
-        }
+        picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
         
-        ofxTableViewCell *scroller = tbv->addCell(ofxTableViewCellStyleScroll, .25 * scale);
+        picture->setImageFromDisk("Icon@2x.png");
         
-        for (int i = 0; i < random()%20 + 1; i++) {
-            
-            ofxTableViewCell *picture = scroller->addCell(ofxTableViewCellStylePicture, .25 * scale);
-            
-            picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
-            
-            picture->setImageFromDisk("Icon@2x.png");
-            
-            myCustomCell *newCell = new myCustomCell;
-            
-            
-            scroller->addCustomCell(newCell, .33);
-            
-            newCell->drawsBorder = false;
-            
-            
-        }
-
+        // 4 // CUSTOM CELL SUBCLASS
+        
+        myCustomCell *newCell = new myCustomCell;
+        
+        nestedTable->addCustomCell(newCell, .25);
+        
+        newCell->drawsBorder = false;
+    }
+    
+    // 5 // MODAL TABLE
+    
+    ofxTableViewCell *modal = tbv->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    modal->addCellWithLabel("MODAL TABLE", 1.);
+    
+    modal->transitionStyle = TransitionStyleZoomIn;
+    modal->transitionTime = 1.5;
+    
+    // add table first
+    
+    modalTable = new ofxTableView;
+    
+    modalTable->initWithParent(modal, modal->getFrame());
+    modalTable->isModal = true;
+    modal->addChild(modalTable);
+    
+    ofxTableViewCell *back = modalTable->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    back->addCellWithLabel("BACK", 1.);
+    
+    back->transitionStyle = TransitionStyleZoomOut;
+    back->transitionTime = 1.;
+    
+    // Create back button
+    
+    for (int i = 0; i < 10 + 1; i++) {
+     
+        modalTable->addCellWithLabel("table cell " + ofToString(i), .25);
         
     }
+    
+    
 
     
 }

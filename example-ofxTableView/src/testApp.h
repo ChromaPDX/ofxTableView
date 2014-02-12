@@ -9,6 +9,9 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     
     public:
+    
+    // OF CORE
+    
         void setup();
         void update();
         void draw();
@@ -25,6 +28,16 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
         void gotMemoryWarning();
         void deviceOrientationChanged(int newOrientation);
 
+    // EXAMPLE VARS
+    
+    ofxTableViewController *vc;
+    ofxTableView *tbv;
+    ofxTableView *modalTable;
+    
+    float rot;
+    float spin;
+    int dir;
+    
     // TABLE VIEW DELEGATE
     
         void cellWasSelected(ofxTableViewCell *cell);

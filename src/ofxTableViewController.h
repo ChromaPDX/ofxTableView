@@ -62,6 +62,10 @@ public:
     void            draw(int x, int y);
     
     vector          <ofxTableView*> tableViews;
+    
+    ofxTableView* addTableView();
+    ofxTableView* addTableView(int x, int y, int w, int h);
+    ofxTableView* addTableView(int x, int y, int z, int w, int h);
     ofxTableView* addTableView(frame3d frame);
     
     void update();

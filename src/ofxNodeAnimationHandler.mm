@@ -28,10 +28,18 @@
 }
 
 - (bool)updateWithTimeSinceLast:(NSTimeInterval) dt{
+    
+    _progress += dt;
+    float completion = _progress / _duration;
+  //  __weak NodeAction *weakSelf = self;
+    
     if (_actionBlock){
-        return _actionBlock(dt);
+        NSLog(@"running block %f", completion);
+        //return _actionBlock(weakSelf, completion);
+        return _actionBlock(completion);
     }
-    return 0;
+    
+    return 1;
 }
 
 - (void)runCompletion {
@@ -46,12 +54,13 @@
 
 @implementation NodeAnimationHandler
 
-- (instancetype) init {
+- (instancetype) initWithNode:(ofNode*)node {
     
     self = [super init];
     
     if (self){
     
+        _node = node;
         actions = [[NSMutableArray alloc]init];
         
     }
@@ -63,7 +72,9 @@
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt{
     
     if (actions.count){
-        if (![(NodeAction*)actions[0] updateWithTimeSinceLast:dt]){
+        NSLog(@"has actions");
+        bool complete = [(NodeAction*)(actions[0]) updateWithTimeSinceLast:dt];
+        if (complete){
             [actions[0] runCompletion];
             [actions removeObject:actions[0]];
         }
@@ -73,6 +84,7 @@
 
 - (void)runAction:(NodeAction *)action {
     
+    action.node = _node;
     [actions addObject:action];
     
 }
@@ -80,7 +92,6 @@
 - (void)runAction:(NodeAction *)action completion:(void (^)())block {
     
     action.completionBlock = block;
-    
     [self runAction:action];
     
 }

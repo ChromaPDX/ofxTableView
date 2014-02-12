@@ -61,12 +61,12 @@ class frame3d {
         h=nh;
     }
     
-    frame3d(ofPoint pos, ofRectangle bounds){
+    frame3d(ofPoint pos, ofPoint size){
         x=pos.x;
         y=pos.y;
         z=pos.z;
-        w=bounds.width;
-        h=bounds.height;
+        w=size.x;
+        h=size.y;
     }
     
     frame3d& operator= (const frame3d& emp)  // Assignment operator overloading function
@@ -141,7 +141,6 @@ typedef enum TransitionStyle {
 
 @property (nonatomic) frame3d sourceFrame;
 @property (nonatomic) frame3d destFrame;
-@property (nonatomic) ofxScrollView* cellRef;
 @property (nonatomic) TransitionStyle style;
 @property (nonatomic) float srcAlpha;
 @property (nonatomic) float dstAlpha;
@@ -159,7 +158,7 @@ private:
 
 protected:
     
-    ofRectangle bounds;
+    frame3d myFrame;
     
     int             _xRootOffset;
     int             _yRootOffset;
@@ -216,6 +215,7 @@ public:
     
     void                    initWithParent(ofxScrollView *parent, frame3d frame);
     void                    addChild(ofxScrollView *child);
+    void                    insertChild(ofxScrollView *child);
     
     void                    update();
     
@@ -253,8 +253,8 @@ public:
 
     bool                    debugUI = false;
     
-    ofxScrollView * _modalParent = NULL;
-    ofxScrollView * _modalChild = NULL;
+    ofxScrollView *         _modalParent = NULL;
+    ofxScrollView *         _modalChild = NULL;
     
     float transitionTime;
     TransitionStyle transitionStyle;
@@ -302,6 +302,8 @@ public:
     bool            scrollingEnabled = false;
     bool            shouldRasterize = false;
     bool            clipToBounds = false;
+    bool            isModal = false;
+    
     
     bool            scrollShouldCull();
     
@@ -337,8 +339,6 @@ public:
     void setBgColor(ofColor color);
     void setFgColor(float* color);
     void setFgColor(ofColor color);
-    
-    
     
 };
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------
-Open Frameworks 0.05
-graphical user interface - Dennis Rosenfeld-2008
-*///--------------------------------
+ Open Frameworks 0.05
+ graphical user interface - Dennis Rosenfeld-2008
+ *///--------------------------------
 
 
 #include "ofxTableViewCell.h"
@@ -22,7 +22,7 @@ void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellSty
     
     cellStyle = ncellStyle;
     autoSizePct = nautoSizePct;
-
+    
     scrollingEnabled = false;
     scrollDirectionVertical = false;
     horizontalPadding = 5*getScreenScale();
@@ -32,7 +32,7 @@ void ofxTableViewCell::initWithParent(ofxTableView *nparent, ofxTableViewCellSty
     drawsName = false;
     
     initStyle(cellStyle);
-                                  
+    
 }
 
 void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCellStyle ncellStyle, float nautoSizePct){
@@ -41,7 +41,7 @@ void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCel
     
     cellStyle = ncellStyle;
     autoSizePct = nautoSizePct;
-
+    
     scrollingEnabled = false;
     scrollDirectionVertical = false;
     horizontalPadding = 0;
@@ -54,36 +54,64 @@ void ofxTableViewCell::initWithParent(ofxTableViewCell *nparent, ofxTableViewCel
     
 }
 
-ofxTableViewCell*    ofxTableViewCell::addCell(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
+ofxTableViewCell*    ofxTableViewCell::addCellWithStyle(ofxTableViewCellStyle ncellStyle, float nautoSizePct)
 {
     ofxTableViewCell *newCell = new ofxTableViewCell;
     
     newCell->initWithParent(this, ncellStyle, nautoSizePct);
     
+    addChild(newCell);
+    
     addDataSourceForCell(newCell);
-
     
     return newCell;
     
 }
 
-void ofxTableViewCell::addCustomCell(ofxTableViewCell* custom, float nautoSizePct)
+ofxTableViewCell*    ofxTableViewCell::addCellWithLabel(string label, float autoSizePct)
 {
-
-    custom->initWithParent(this, ofxTableViewCellStyleCustom, nautoSizePct);
     
-    addDataSourceForCell(custom);
-
+    ofxTableViewCell *newCell = addCellWithStyle(ofxTableViewCellStyleText, autoSizePct);
+    
+    addChild(newCell);
+    
+    newCell->setString(label);
+    
+    return newCell;
     
 }
 
+void  ofxTableViewCell::addCustomCell(ofxTableViewCell *newCell, float autoSizePct){
+    
+    newCell->initWithParent(this, ofxTableViewCellStyleCustom, autoSizePct);
+    
+    addChild(newCell);
+    
+    addDataSourceForCell(newCell);
+    
+}
+
+ofxTableView*    ofxTableViewCell::addTable(float nautoSizePct)
+{
+    
+    ofxTableView *nestedTable = new ofxTableView;
+    
+    nestedTable->initWithParent(this, nautoSizePct);
+    
+    addChild(nestedTable);
+    
+    (*dataSource)[nestedTable->referenceId] = nestedTable->dictionary;
+    
+    return nestedTable;
+    
+}
 
 void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
 {
     cellStyle = style;
     
     if (style == ofxTableViewCellStyleDefault){
-      
+        
     }
     
     else if (style == ofxTableViewCellStyleText){
@@ -119,6 +147,13 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
         
     }
     
+    else if (style == ofxTableViewCellStyleContainer){
+        scrollDirectionVertical = false;
+        scrollingEnabled = false;
+        horizontalPadding = 0;
+        verticalPadding = 0;
+    }
+    
     else if (style == ofxTableViewCellStyleModal){
         
         displayName = "Nested Table";
@@ -138,13 +173,13 @@ void    ofxTableViewCell::initStyle(ofxTableViewCellStyle style)
         
         
     }
-
-
+    
+    
 }
 
 
 void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
-  
+    
     UniversalContainer dictionary = *dataSource;
     
     if (cell->cellStyle == ofxTableViewCellStyleText) {
@@ -176,7 +211,7 @@ void ofxTableViewCell::addDataSourceForCell(ofxTableViewCell *cell){
         dictionary[cell->referenceId]["text"] = "default";
         
         cell->dataSource = &dictionary[cell->referenceId]["text"];
-
+        
     }
     
 }
@@ -208,9 +243,9 @@ void    ofxTableViewCell::draw()
     if (!hidden) {
         
         
-        ofxScrollView::begin();
+        begin();
         
-
+        
         ofRectangle d = getDrawFrame();
         
         if (cellStyle == ofxTableViewCellStyleText) {
@@ -221,13 +256,13 @@ void    ofxTableViewCell::draw()
             glTranslatef(0, 0, 1);
             sharedFont->drawString((string)*dataSource, -(sharedFont->stringWidth((string)*dataSource)/2.), (sharedFont->stringHeight((string)*dataSource)/2.));
             ofPopMatrix();
-
+            
         }
         
         else if (cellStyle == ofxTableViewCellStyleGraph){
             
             if (dataSource) {
-
+                
                 if (dataSource->get_type() == uc_Array){
                     
                     ofFill();
@@ -250,15 +285,15 @@ void    ofxTableViewCell::draw()
                     }
                     
                     path.lineTo(d.width, d.height);
-
+                    
                     
                     path.draw(d.x, d.y);
-
+                    
                 }
-
+                
                 
             }
-
+            
         }
         
         else if (cellStyle == ofxTableViewCellStylePicture) {
@@ -268,52 +303,150 @@ void    ofxTableViewCell::draw()
             if (!_image.isAllocated() && dataSource && dataSource->length() != 0) {
                 _image.loadImage(*dataSource);
             }
-
+            
             float scale = MIN(d.height / _image.height, d.width / _image.width);
             _image.draw(d.x + ((d.width - _image.width*scale) / 2.),d.y+((d.height - _image.height*scale) / 2.),_image.width*scale, _image.height*scale);
-
+            
             
         }
         
-//        else if (cellStyle == ofxTableViewCellStyleSlider) {
-//            drawSlider(rect);
-//        }
+        else if (cellStyle == ofxTableViewCellStyleModal){
+            
+//            for (int i = 0; i < children.size(); i++){
+//                
+//                if (!children[0]->_modalParent) {
+//                    children[0]->hidden = true;
+//                }
+//                
+//            }
+            
+        }
         
-//        if (customDrawFunction) {
-//            customDrawFunction(rect, customDrawData);
-//        }
+        //        else if (cellStyle == ofxTableViewCellStyleSlider) {
+        //            drawSlider(rect);
+        //        }
+        
+        //        if (customDrawFunction) {
+        //            customDrawFunction(rect, customDrawData);
+        //        }
         
         
-        ofxScrollView::end();
+        end();
         
     }
     
 }
 
+void ofxTableViewCell::begin(){
+    ofxScrollView::begin();
+}
+
+void ofxTableViewCell::end(){
+    
+    if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
+    {
+        
+        ofRectangle d = getDrawFrame();
+        
+        for(int i = 0; i < children.size(); i++)
+        {
+            
+            if (cellStyle == ofxTableViewCellStyleModal) {
+                
+                if (children[i]->isModal) {
+                    
+                    if (!getRoot()->_modalChild) {
+                        
+                        setChildFrame(children[i]);
+                        
+                        if (drawsModalChild) {
+                            if (!children[i]->hidden) {
+                                children[i]->draw();
+                            }
+                        }
+                    }
+                    
+                }
+                
+                else {
+                    setChildFrame(children[i]);
+                    children[i]->draw();
+                }
+                
+            }
+            
+            else {
+                setChildFrame(children[i]);
+                if (!children[i]->hidden) {
+                    children[i]->draw();
+                }
+            }
+            
+        }
+        
+        if (drawsBorder) {
+            ofNoFill();
+            
+            ofSetColorf(fgColor);
+            ofSetLineWidth(2*getScreenScale());
+            
+            ofRect(d);
+        }
+        
+        
+        if (shouldRasterize) {
+            
+            raster.end();
+            
+            ofPushMatrix();
+            ofMultMatrix( getLocalTransformMatrix() );
+            
+            raster.draw(d.x, d.y);
+            
+        }
+        
+        
+        
+        if (highlighted) {
+            ofEnableBlendMode(OF_BLENDMODE_ADD);
+            ofFill();
+            ofSetColor(255,255,255,100);
+            ofRect(d);
+            ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        }
+        
+        dirty = false;
+        fdirty = false;
+        
+        ofPopMatrix();
+        
+    }
+}
+
 //void ofxTableViewCell::drawSlider(){
-//    
+//
 //    float percent = ((floatValue - minValue) / (maxValue - minValue));
-//    
+//
 //    int slideWidth = int(percent*(float)rect.width);
-//    
+//
 //    ofFill();
-//    
+//
 //    ofSetColorf(fgColor);
-//    
+//
 ////    if (fgColor != 0) ofSetColor(fgColor);
 ////    else ofSetColor(parent->fgColor);
 //
 //    ofRect(rect.x, rect.y, slideWidth, rect.height);
-//    
+//
 //}
 
 void ofxTableViewCell::setString(string s){
     
     if (dataSource->get_type() == uc_String || dataSource->get_type() == uc_Null) {
         
-    *dataSource = s;
-    
-    NSLog(@"set string %s for cell %d " , ((string)*dataSource).c_str(), referenceId);
+        *dataSource = s;
+        
+        NSLog(@"set string %s for cell %d " , ((string)*dataSource).c_str(), referenceId);
         
     }
     
@@ -365,14 +498,26 @@ void ofxTableViewCell::setModalTable(ofxScrollView *modal){
     
 }
 
+
 bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
     
     if (cellStyle == ofxTableViewCellStyleModal) {
         if (!getRoot()->_modalChild){
-            if (children.size()) {
-                NSLog(@"presenting modal table");
-                ((ofxTableView*)getRoot())->pushModalView(children[0], transitionStyle, transitionTime);
-            }
+
+                for (int i = 0; i < children.size(); i++) {
+                    
+                    if (children[i]->isModal) {
+                        
+                        ((ofxTableView*)getRoot())->pushModalView(children[i], transitionStyle, transitionTime);
+                        
+                        NSLog(@"presenting modal table");
+                        i = children.size();
+                        
+                    }
+                    
+                   // NSLog(@"found type %s", typeid(children[i]).name());
+                }
+            
         }
         
         if (getRoot()->_modalParent) {
@@ -383,12 +528,12 @@ bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
     
     else if (  ofxScrollView::touchUp(x, y, touchId) ){
         
-
-            if (((ofxTableView*)getRoot())->delegate) {
-                ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
-               // logFrame(getGlobalFrame());
-            }
-            
+        
+        if (((ofxTableView*)getRoot())->delegate) {
+            ((ofxTableView*)getRoot())->delegate->cellWasSelected(this);
+            // logFrame(getGlobalFrame());
+        }
+        
         
         
         return true;
@@ -397,14 +542,14 @@ bool     ofxTableViewCell::touchUp(float x, float y, int touchId){
     
     return false;
     
-   
-
+    
+    
 }
 
 bool     ofxTableViewCell::touchDown(float x, float y, int touchId){
     
     return ofxScrollView::touchDown(x, y, touchId);
-
+    
     
 }
 
