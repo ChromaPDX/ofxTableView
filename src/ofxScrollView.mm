@@ -6,8 +6,109 @@
 
 #include <Foundation/Foundation.h>
 
+@implementation ScrollViewAction
+
+
+inline float weightedAverage (float src, float dst, float d){
+    
+    return src == dst ? src : ((src * (1.-d) + dst * d));
+    
+}
+
+inline float logAverage (float src, float dst, float d){
+    
+    return src == dst ? src : ((src * (1.- d*d) + dst * d * d));
+    
+}
+
+
+inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
+    
+    return frame3d(weightedAverage(src.x, dst.x, d),
+                   weightedAverage(src.y, dst.y, d),
+                   weightedAverage(src.z, dst.z, d),
+                   weightedAverage(src.w, dst.w, d),
+                   weightedAverage(src.h, dst.h, d));
+    
+}
+
++(ScrollViewAction*)TransitionWithStyle:(TransitionStyle) style Duration:(NSTimeInterval)duration {
+    
+    ScrollViewAction* action = [[ScrollViewAction alloc] init];
+    
+    action.style = style;
+    action.duration = duration;
+    
+    action.actionBlock = (ActionBlock)^(float completion){
+        
+        switch (action.style) {
+                
+            case TransitionStyleNone:
+                
+                break;
+                
+            case TransitionStyleEnterFromRight: case TransitionStyleEnterFromLeft: case TransitionStyleExitToLeft: case TransitionStyleExitToRight:
+                
+                action.cellRef->setFrame(getTweenFrame(action.sourceFrame, action.destFrame, completion));
+                
+                break;
+                
+            case TransitionStyleZoomIn: case TransitionStyleZoomOut:
+                
+                action.cellRef->setFrame(getTweenFrame(action.sourceFrame, action.destFrame, completion));
+                
+                break;
+                
+            case TransitionStyleFade:
+                action.cellRef->alpha = weightedAverage(action.srcAlpha, action.dstAlpha, completion);
+                
+            default:
+                break;
+        }
+        
+        if (completion > 1.){
+        
+            action.cellRef->setFrame(action.destFrame);
+            
+            if (action.style == TransitionStyleExitToLeft || action.style == TransitionStyleExitToRight || action.style == TransitionStyleZoomIn) {
+                action.cellRef->hidden = true;
+            }
+            
+            if (action.style == TransitionStyleEnterFromLeft || action.style == TransitionStyleEnterFromRight || action.style == TransitionStyleZoomOut) {
+                if (action.cellRef->_modalChild) {
+                    
+                    action.cellRef->_modalChild->setOrientation(action.cellRef->_modalChild->cachedOrientation);
+                    action.cellRef->_modalChild->setParent(action.cellRef->_modalChild->_parent);
+                    
+                    action.cellRef->_modalChild->_modalParent = NULL;
+                    action.cellRef->_modalChild = NULL;
+                    
+                    
+                    
+                }
+            }
+            
+            return 0;
+        
+        }
+        
+        return 1;
+
+        NSLog(@"animation compelted after %f seconds", action.progress);
+        
+    };
+
+
+return action;
+
+}
+
+
+@end
+
 ofxScrollView:: ofxScrollView()//constructor
 {
+    animationHandler = [[NodeAnimationHandler alloc] init];
 }
 
 ofxScrollView::~ ofxScrollView()//destructor
@@ -185,9 +286,6 @@ ofNode* ofxScrollView::getParent(){
 
 void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, float durationSec){
     
-    
-
-    
     _modalChild = child;
     child->_modalParent = this;
     child->cachedOrientation = ofQuaternion(child->getOrientationQuat());
@@ -195,29 +293,19 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
 
     // Create My Transition Object
     
-    ofxScrollViewAnimation* currentAnimation = new ofxScrollViewAnimation;
+    ScrollViewAction *action = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
     
-    currentAnimation->completed = false;
-    currentAnimation->completion = 0.0f;
-    currentAnimation->duration = durationSec * 1000;
-    currentAnimation->startTime = ofGetElapsedTimeMillis();
-    currentAnimation->style = style;
-    currentAnimation->sourceFrame = getFrame();
+    action.sourceFrame = getFrame();
     
-    
+
     // Create Child Transition Object
     
-    ofxScrollViewAnimation* childAnimation = new ofxScrollViewAnimation;
+    ScrollViewAction *action2 = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
     
-    childAnimation->completed = false;
-    childAnimation->completion = 0.0f;
-    childAnimation->duration = durationSec * 1000;
-    childAnimation->startTime = ofGetElapsedTimeMillis();
-    childAnimation->style = style;
+    action2.sourceFrame = getFrame();
     
     child->hidden = false;
     
-    childAnimation->destFrame = getFrame();
     
     switch (style) {
             
@@ -227,10 +315,10 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
         case TransitionStyleExitToLeft:
             
-            childAnimation->sourceFrame = frame3d(bounds.x+bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            action2.sourceFrame = frame3d(bounds.x+bounds.width, bounds.y, 0, bounds.width, bounds.height);
             
-            currentAnimation->destFrame = frame3d(bounds.x-bounds.width, bounds.y,getZ(), bounds.width, bounds.height);
-            childAnimation->style = TransitionStyleEnterFromRight;
+            action.destFrame = frame3d(bounds.x-bounds.width, bounds.y,getZ(), bounds.width, bounds.height);
+            action2.style = TransitionStyleEnterFromRight;
             
             
             child->hidden = false;
@@ -239,10 +327,10 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
         case TransitionStyleExitToRight:
             
-            childAnimation->sourceFrame = frame3d(bounds.x-bounds.width, bounds.y, 0, bounds.width, bounds.height);
+            action2.sourceFrame = frame3d(bounds.x-bounds.width, bounds.y, 0, bounds.width, bounds.height);
             
-            currentAnimation->destFrame = frame3d(bounds.x+bounds.width, bounds.y, getZ(), bounds.width, bounds.height);
-            childAnimation->style = TransitionStyleEnterFromLeft;
+            action.destFrame = frame3d(bounds.x+bounds.width, bounds.y, getZ(), bounds.width, bounds.height);
+            action2.style = TransitionStyleEnterFromLeft;
 
             break;
             
@@ -250,17 +338,15 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
             child->hidden = false;
             
-            childAnimation->sourceFrame = frame3d(child->getGlobalPosition(), child->bounds);
+            action2.sourceFrame = frame3d(child->getGlobalPosition(), child->bounds);
             
            // logFrame(frame3d(child->getFrame()));
            // logFrame(frame3d(child->getGlobalPosition(), child->bounds));
             
-            _modalChild->cachedFrame = childAnimation->sourceFrame;
+            _modalChild->cachedFrame = action2.sourceFrame;
             
-            currentAnimation->destFrame = frame3d(getX(), getY(), getZ()+1000, bounds.width,bounds.height);
-            
-            childAnimation->style = TransitionStyleZoomOut;
-            
+            action.destFrame = frame3d(getX(), getY(), getZ()+1000, bounds.width,bounds.height);
+            action2.style = TransitionStyleZoomOut;
             
             break;
             
@@ -270,15 +356,15 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             break;
     }
     
-    NSLog(@"Starting Animation");
-    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
-    
-    animations.push_back(currentAnimation);
-    child->animations.push_back(childAnimation);
-    
     child->clearParent();
-
+    
+    [animationHandler runAction:action];
+    [child->animationHandler runAction:action2];
+    
+    NSLog(@"Starting Animation");
+    
+    logFrame(action.destFrame);
+    logFrame(action2.destFrame);
     
 }
 
@@ -288,28 +374,21 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
     
     _modalChild->_modalParent = NULL;
     
+    
     // Create My Transition Object
     
-    ofxScrollViewAnimation* currentAnimation = new ofxScrollViewAnimation;
+    ScrollViewAction *action = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
     
-    currentAnimation->completed = false;
-    currentAnimation->completion = 0.0f;
-    currentAnimation->duration = durationSec * 1000;
-    currentAnimation->startTime = ofGetElapsedTimeMillis();
-    currentAnimation->style = style;
-    currentAnimation->sourceFrame = getFrame();
+    action.sourceFrame = getFrame();
     
     
     // Create Child Transition Object
     
-    ofxScrollViewAnimation* childAnimation = new ofxScrollViewAnimation;
+    ScrollViewAction *action2 = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
     
-    childAnimation->completed = false;
-    childAnimation->completion = 0.0f;
-    childAnimation->duration = durationSec * 1000;
-    childAnimation->startTime = ofGetElapsedTimeMillis();
-    childAnimation->style = style;
-    childAnimation->sourceFrame = child->getFrame();
+    action2.sourceFrame = child->getFrame();
+    
+    child->hidden = false;
     
     switch (style) {
         case TransitionStyleNone:
@@ -318,11 +397,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromLeft:
             
-            currentAnimation->destFrame = frame3d(getX()+bounds.width, getY(), getZ(), bounds.width, bounds.height);
+            action.destFrame = frame3d(getX()+bounds.width, getY(), getZ(), bounds.width, bounds.height);
             
-            childAnimation->style = TransitionStyleExitToRight;
+            action2.style = TransitionStyleExitToRight;
             
-            childAnimation->destFrame = frame3d(child->getX()+child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
+            action2.destFrame = frame3d(child->getX()+child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
             
@@ -330,11 +409,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromRight:
             
-            currentAnimation->destFrame = frame3d(getX()-bounds.width, getY(), getZ(), bounds.width, bounds.height);
+            action.destFrame = frame3d(getX()-bounds.width, getY(), getZ(), bounds.width, bounds.height);
             
-            childAnimation->style = TransitionStyleExitToLeft;
+            action2.style = TransitionStyleExitToLeft;
             
-            childAnimation->destFrame = frame3d(child->getX()-child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
+            action2.destFrame = frame3d(child->getX()-child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
             
@@ -346,11 +425,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
             //_modalChild->cachedFrame = _modalChild->getFrame();
             
-            currentAnimation->destFrame = frame3d(getX(), getY(), 0, bounds.width,bounds.height);
+            action.destFrame = frame3d(getX(), getY(), 0, bounds.width,bounds.height);
             
-            childAnimation->destFrame = _modalChild->cachedFrame;
+            action2.destFrame = _modalChild->cachedFrame;
             
-            childAnimation->style = TransitionStyleEnterFromLeft;
+            action2.style = TransitionStyleEnterFromLeft;
             
             break;
             
@@ -358,118 +437,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             break;
     }
     
-    if (animations.size()) {
-        currentAnimation->sourceFrame = animations[animations.size()-1]->destFrame;
-    }
-    if (child->animations.size()) {
-        childAnimation->sourceFrame = child->animations[child->animations.size()-1]->destFrame;
-    }
-    
-    NSLog(@"Starting Animation");
-    NSLog(@"target bounds: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
-    NSLog(@"child target bounds: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
-    
-    animations.push_back(currentAnimation);
-    child->animations.push_back(childAnimation);
     
 }
 
 
-inline float weightedAverage (float src, float dst, float d){
-    
-    return src == dst ? src : ((src * (1.-d) + dst * d));
-    
-}
 
-inline float logAverage (float src, float dst, float d){
-    
-    return src == dst ? src : ((src * (1.- d*d) + dst * d * d));
-    
-}
-
-inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
-    
-    return frame3d(weightedAverage(src.x, dst.x, d),
-                       weightedAverage(src.y, dst.y, d),
-                       weightedAverage(src.z, dst.z, d),
-                       weightedAverage(src.w, dst.w, d),
-                       weightedAverage(src.h, dst.h, d));
-    
-}
-
-void ofxScrollView::updateAnimation(ofxScrollViewAnimation *anim) {
-    
-    
-    anim->completion = ((float)(ofGetElapsedTimeMillis() - anim->startTime) / (anim->duration));
-    
-    //NSLog(@"update %f completion", anim->completion);
-    
-    switch (anim->style) {
-            
-        case TransitionStyleNone:
-            
-            break;
-            
-        case TransitionStyleEnterFromRight: case TransitionStyleEnterFromLeft: case TransitionStyleExitToLeft: case TransitionStyleExitToRight:
-            
-            setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
-            
-            break;
-            
-        case TransitionStyleZoomIn: case TransitionStyleZoomOut:
-            
-            setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
-            
-            break;
-            
-        case TransitionStyleFade:
-            alpha = weightedAverage(anim->srcAlpha, anim->dstAlpha, anim->completion);
-            
-        default:
-            break;
-    }
-    
-    if (anim->completion >= 1.){
-        
-        setFrame(anim->destFrame);
-        
-        if (anim->style == TransitionStyleExitToLeft || anim->style == TransitionStyleExitToRight || anim->style == TransitionStyleZoomIn) {
-            hidden = true;
-        }
-        
-        if (anim->style == TransitionStyleEnterFromLeft || anim->style == TransitionStyleEnterFromRight || anim->style == TransitionStyleZoomOut) {
-            if (_modalChild) {
-                
-                _modalChild->setOrientation(_modalChild->cachedOrientation);
-                
-                //_modalChild->hidden = true;
-                
-                _modalChild->setParent(_modalChild->_parent);
-                
-                _modalChild->_modalParent = NULL;
-                _modalChild = NULL;
-                
-                
-                
-            }
-        }
-        
-        delete anim;
-        
-        animations.erase(animations.begin());
-        
-        NSLog(@"animation compelted after %llu seconds", (ofGetElapsedTimeMillis() - anim->startTime));
-        
-//        if (_modalChild) {
-//                 popModalView(TransitionStyleEnterFromLeft, 1.);
-//        }
-        
-        
-    }
-    
-
-    
-}
 
 
 
@@ -545,9 +517,7 @@ void ofxScrollView::update() {
         
     }
     
-    if (animations.size()) {
-        updateAnimation(animations[0]);
-    }
+    [animationHandler updateWithTimeSinceLast:.02];
     
     for(int i = 0; i < children.size(); i++)
     {

@@ -32,6 +32,7 @@
 #define  ofxScrollView_H_INCLUDED
 
 #include "ofMain.h"
+#import "ofxNodeAnimationHandler.h"
 
 #define DEFAULT_FONT_STRING "ofxTableViewDefault.ttf"
 #define DEFAULT_FONT_SIZE 16
@@ -86,6 +87,12 @@ class frame3d {
         return h;
     }
     
+    void setPosition(ofPoint position){
+        x = position.x;
+        y = position.y;
+        z = position.z;
+    }
+    
     ofPoint getPosition() {
         return ofPoint(x,y,z);
     }
@@ -101,8 +108,7 @@ class frame3d {
     ofRectangle getBounds(){
         return ofRectangle(0,0,w,h);
     }
-    
-    
+
     
 };
 
@@ -127,32 +133,23 @@ typedef enum TransitionStyle {
     TransitionStyleFade
 } TransitionStyle;
 
+@interface ScrollViewAction : NodeAction
 
-class    ofxScrollViewAnimation
 {
-    
-public:
-    
-    int scrollPosition = 0;
-    
-    bool completed = false;
-    
-    long long startTime = 0;
-    long long duration = 0;
-    
-    float completion = 0;
-    
-    float srcAlpha = 1.;
-    float dstAlpha = 1.;
-    
-    frame3d sourceFrame;
-    frame3d destFrame;
-    
-    ofxScrollView* cellRef;
-    
-    TransitionStyle style;
-    
-};
+    int scrollPosition;
+}
+
+@property (nonatomic) frame3d sourceFrame;
+@property (nonatomic) frame3d destFrame;
+@property (nonatomic) ofxScrollView* cellRef;
+@property (nonatomic) TransitionStyle style;
+@property (nonatomic) float srcAlpha;
+@property (nonatomic) float dstAlpha;
+
++(ScrollViewAction*)TransitionWithStyle:(TransitionStyle) style Duration:(NSTimeInterval)duration;
+
+@end
+
 
 class    ofxScrollView : public ofNode
 {
@@ -163,9 +160,6 @@ private:
 protected:
     
     ofRectangle bounds;
-    
-    
-    float alpha;
     
     int             _xRootOffset;
     int             _yRootOffset;
@@ -202,10 +196,11 @@ protected:
     
     ofFbo           raster;
     
-    ofxScrollView * _parent = NULL;
+    
     vector<ofxScrollView *> children;
     
-    vector<ofxScrollViewAnimation *> animations;
+    //vector<ScrollViewAnimation *> animations;
+    NodeAnimationHandler *animationHandler;
 
     bool            highlighted = false;
     
@@ -213,6 +208,7 @@ public:
     ofxScrollView();                           //constructor
     ~ ofxScrollView();                          //destructor
     
+    ofxScrollView * _parent = NULL;
     //METHODS:--------------------------------------------------------
     
     // METHODS TO BE CALLED BY SUBCLASSES
@@ -246,9 +242,9 @@ public:
     
     void                    pushModalView(ofxScrollView *child, TransitionStyle transitionStyle, float durationSec);
     void                    popModalView(TransitionStyle transitionStyle,float durationSec);
-    void                    updateAnimation(ofxScrollViewAnimation *anim);
     
     ofNode*                 getParent();
+    void                    setParent(ofxScrollView* parent);
     
     ofxScrollView*          getRoot();
     
@@ -267,12 +263,10 @@ public:
 
     frame3d cachedFrame;
     ofQuaternion cachedOrientation;
-    
-    void                    setParent(ofxScrollView* parent);
-    
+
     virtual void            draw();
     
-    void                setChildFrame(ofxScrollView *view);
+    void                    setChildFrame(ofxScrollView *view);
     
     virtual bool            containsPoint(int x, int y);           //check to see if mouse is within boundaries of this panel.
     
@@ -285,12 +279,16 @@ public:
     
     
     void scaleFrame(float scale);
-    float _scale = 1.;
+
     
     // INHERITED FROM OF NODE
     
     
     // PUBLIC SCALAR PROPERTIES
+    
+    float _scale = 1.;
+    
+    float alpha;
     
     string          displayName = "null";
     
