@@ -9,11 +9,11 @@ ofxNodeAnimationHandler + NodeAction provides block based animation system that 
 
 TO DO:
 
-!! remove cell, obviously a big one + memory cleanup will happen soon.
+0% !! remove cell, obviously a big one + memory cleanup will happen soon.
 
-'data source' for model objects / refresh controller not yet implemented.
-table views are currently created programatically.
-working on Block animation system.
+0% 'data source' for model objects / refresh controller not yet implemented.
+
+50% Working on Block animation system.
 
 Dependencies + ackknowledgements :
 
