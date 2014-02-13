@@ -81,10 +81,10 @@ class frame3d {
         return *this;
     }
     
-    float getWidth(){
+    float getWidth() const{
         return w;
     }
-    float getHeight(){
+    float getHeight() const{
         return h;
     }
     
@@ -94,19 +94,19 @@ class frame3d {
         z = position.z;
     }
     
-    ofPoint getPosition() {
+    ofPoint getPosition() const{
         return ofPoint(x,y,z);
     }
     
-    ofPoint getSize(){
+    ofPoint getSize() const{
         return ofPoint(w,h);
     }
     
-    ofPoint getCenter(){
+    ofPoint getCenter() const{
         return ofPoint(x+w/2.,y+h/2.,z);
     }
     
-    ofRectangle getBounds(){
+    ofRectangle getBounds() const{
         return ofRectangle(0,0,w,h);
     }
 
@@ -162,6 +162,9 @@ private:
 protected:
     
     frame3d myFrame;
+    frame3d oldFrame;
+    
+    ofPoint animatedOffset;
     
     int             _xRootOffset;
     int             _yRootOffset;
@@ -202,7 +205,7 @@ protected:
     vector<ofxScrollView *> children;
     
     //vector<ScrollViewAnimation *> animations;
-    NodeAnimationHandler *animationHandler;
+   
 
     bool            highlighted = false;
     
@@ -264,8 +267,12 @@ public:
     
     // METHODS TO OVERRIDE
 
+    NodeAnimationHandler *animationHandler;
+    
     frame3d cachedFrame;
     ofQuaternion cachedOrientation;
+    
+    double lastTime;
 
     virtual void            draw();
     
@@ -285,8 +292,7 @@ public:
 
     
     // INHERITED FROM OF NODE
-    
-    
+
     // PUBLIC SCALAR PROPERTIES
     
     float _scale = 1.;

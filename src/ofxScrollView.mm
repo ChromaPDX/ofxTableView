@@ -538,7 +538,13 @@ void ofxScrollView::update() {
         
     }
     
-    [animationHandler updateWithTimeSinceLast:16];
+    double time = ofGetElapsedTimeMillis();
+    
+    if (lastTime != 0) {
+    [animationHandler updateWithTimeSinceLast:time - lastTime];
+    }
+    
+    lastTime = time;
     
     for(int i = 0; i < children.size(); i++)
     {
@@ -923,15 +929,18 @@ void ofxScrollView::setFrame(frame3d frame){
     if (myFrame.h != frame.h || myFrame.w != frame.w || getZ() != frame.z) { // SCALED, refresh content size
         cdirty = true;
     }
+
+    setPosition(frame.getPosition());
     
-    setPosition(frame.x, frame.y, frame.z);
+    //NSLog(@"moving %f", frame.getPosition().x - myFrame.getPosition().x);
     
     myFrame = frame;
     
     fdirty = true;
     
-    //setPosition(nmyFrame.x + nmyFrame.w/2., nmyFrame.y+nmyFrame.h/2, getZ());
 }
+
+
 
 
 void ofxScrollView::scaleFrame(float scale){

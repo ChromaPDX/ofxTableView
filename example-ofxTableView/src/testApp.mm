@@ -83,13 +83,40 @@ void testApp::setup(){
     
     ofxTableView *nestedTable = tbv->addTable(.5);
     
-    for (int i = 0; i < 10 + 1; i++) {
+    for (int i = 0; i < 10; i++) {
         
         ofxTableViewCell *picture = nestedTable->addCellWithStyle(ofxTableViewCellStylePicture, .33);
         
         picture->setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
         
         picture->setImageFromDisk("Icon@2x.png");
+        
+        // DO SOME ANIMATION
+
+        //[picture->animationHandler runAction:[NodeAction rotateToAngle:90 duration:1.]];
+        
+  //      [picture->animationHandler runAction:[NodeAction repeatActionForever:[NodeAction rotateByAngle:120 duration:1.]]];
+        
+       // [picture->animationHandler runAction:[NodeAction repeatActionForever:[NodeAction moveByX:10 y:0 duration:1.]]];
+        
+//        [picture->animationHandler runAction:[NodeAction repeatActionForever:
+//                                              [NodeAction sequence:@[[NodeAction rotateByAngle:90 duration:1.],
+//                                                                    [NodeAction rotateByAngle:-30 duration:.5]
+//                                                                     ]]
+//                                             ]];
+        
+        [picture->animationHandler runAction:[NodeAction repeatActionForever:
+                                              [NodeAction sequence:@[[NodeAction group:@[
+                                                                                         [NodeAction rotateByAngle:110 duration:.6],
+                                                                                         [NodeAction moveByX:80 y:0 duration:.4],
+                                                                                         [NodeAction moveByX:0 y:-90 duration:.4]]],
+                                                                     [NodeAction group:@[
+                                                                                         [NodeAction rotateByAngle:-30 duration:.2],
+                                                                                         [NodeAction moveByX:-160 y:0 duration:.4],
+                                                                                         [NodeAction moveByX:80 y:0 duration:.4],
+                                                                                         [NodeAction moveByX:0 y:90 duration:.4]]]
+                                                                     ]]
+                                              ]];
         
         // 4 // CUSTOM CELL SUBCLASS
         

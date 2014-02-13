@@ -67,6 +67,8 @@ typedef bool (^ActionBlock)(float completion);
 
 @property (nonatomic) ofPoint startPos;
 @property (nonatomic) ofPoint endPos;
+@property (nonatomic) ofQuaternion startOrientation;
+@property (nonatomic) ofQuaternion endOrientation;
 
 @property (nonatomic) bool reset;
 
