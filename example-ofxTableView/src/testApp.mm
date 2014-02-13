@@ -93,18 +93,6 @@ void testApp::setup(){
         
         // DO SOME ANIMATION
 
-        //[picture->animationHandler runAction:[NodeAction rotateToAngle:90 duration:1.]];
-        
-  //      [picture->animationHandler runAction:[NodeAction repeatActionForever:[NodeAction rotateByAngle:120 duration:1.]]];
-        
-       // [picture->animationHandler runAction:[NodeAction repeatActionForever:[NodeAction moveByX:10 y:0 duration:1.]]];
-        
-//        [picture->animationHandler runAction:[NodeAction repeatActionForever:
-//                                              [NodeAction sequence:@[[NodeAction rotateByAngle:90 duration:1.],
-//                                                                    [NodeAction rotateByAngle:-30 duration:.5]
-//                                                                     ]]
-//                                             ]];
-        
         [picture->animationHandler runAction:[NodeAction repeatActionForever:
                                               [NodeAction sequence:@[[NodeAction group:@[
                                                                                          [NodeAction rotateByAngle:110 duration:.6],
