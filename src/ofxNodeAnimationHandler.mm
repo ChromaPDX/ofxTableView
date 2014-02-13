@@ -16,15 +16,32 @@
     if(self){
         _progress = 0;
         _speed = 1.;
-        
+        _repeats = 0;
     }
     return self;
 }
 
-+ (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec {
-    NodeAction * action = [[NodeAction alloc] init];
++ (NodeAction *)group:(NSArray *)actions {
     
+    NodeAction * action = [[NodeAction alloc] init];
+    action.children = [actions mutableCopy];
     return action;
+    
+}
+
++ (NodeAction *)sequence:(NSArray *)actions {
+    
+    NodeAction * action = [NodeAction group:actions];
+    action.serial = true;
+    return action;
+    
+}
+
++ (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec {
+    
+    NodeAction * action = [[NodeAction alloc] init];
+    return action;
+    
 }
 
 - (bool)updateWithTimeSinceLast:(NSTimeInterval) dt{
@@ -69,15 +86,48 @@
     
 }
 
+
+
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt{
     
-    if (actions.count){
-        NSLog(@"has actions");
-        bool complete = [(NodeAction*)(actions[0]) updateWithTimeSinceLast:dt];
-        if (complete){
-            [actions[0] runCompletion];
-            [actions removeObject:actions[0]];
+    if (actions.count) {
+        [self executeAction:actions[0] dt:dt];
+    }
+    
+}
+
+-(void)executeAction:(NodeAction *)action dt:(NSTimeInterval) dt{
+    
+    if (action.children) { // GROUPS
+        if (action.children.count) {
+            if (action.serial) {
+                [self executeAction:action.actions[0] dt:dt];
+            }
+            
+            else { // paralell
+                for (NodeAction* ac in action.children) {
+                    [self executeAction:ac dt:dt];
+                }
+            }
         }
+    }
+    
+    else {
+        
+        bool complete = [action updateWithTimeSinceLast:dt];
+        
+        if (complete){
+            if (action.repeats == 0) {
+                [action runCompletion];
+                [action.parentAction.actions removeObject:action];
+            }
+            
+            else if (action.repeats > 0){
+                action.repeats -= 1;
+                action.actions = [action.children mutableCopy];
+            }
+        }
+        
     }
     
 }
@@ -86,6 +136,14 @@
     
     action.node = _node;
     [actions addObject:action];
+    
+}
+
+- (void)runAction:(NodeAction *)action repeat:(int)repeats {
+    
+    if (repeats != 0) action.repeats = repeats;
+    else action.repeats = -1;
+    [self runAction:action];
     
 }
 

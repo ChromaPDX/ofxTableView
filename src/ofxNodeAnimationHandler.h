@@ -33,6 +33,12 @@ typedef bool (^ActionBlock)(float completion);
 @property (nonatomic, copy) void (^completionBlock)(void);
 @property (nonatomic) NSTimeInterval progress;
 @property (nonatomic) NSTimeInterval duration;
+@property (nonatomic) NSInteger repeats;
+@property (nonatomic) bool serial;
+
+@property (nonatomic, weak) NodeAction *parentAction;
+@property (nonatomic, strong) NSArray *children;
+@property (nonatomic, strong) NSMutableArray *actions;
 
 - (NodeAction *)reversedAction;
 
@@ -66,11 +72,12 @@ typedef bool (^ActionBlock)(float completion);
 //+ (NodeAction *)scaleXTo:(CGFloat)xScale y:(CGFloat)yScale duration:(NSTimeInterval)sec;
 //+ (NodeAction *)scaleXTo:(CGFloat)scale duration:(NSTimeInterval)sec;
 //+ (NodeAction *)scaleYTo:(CGFloat)scale duration:(NSTimeInterval)sec;
-//
-//+ (NodeAction *)sequence:(NSArray *)actions;
-//
-//+ (NodeAction *)group:(NSArray *)actions;
-//
+
++ (NodeAction *)sequence:(NSArray *)actions;
+
++ (NodeAction *)group:(NSArray *)actions;
+
+
 //+ (NodeAction *)repeatAction:(NodeAction *)action count:(NSUInteger)count;
 //+ (NodeAction *)repeatActionForever:(NodeAction *)action;
 //
@@ -110,6 +117,11 @@ typedef bool (^ActionBlock)(float completion);
 //+ (NodeAction *)customActionWithDuration:(NSTimeInterval)seconds actionBlock:(void (^)(ofNode *node, NSTimeInterval dt))block;
 
 @end
+
+
+@interface NodeActionGroup : NSArray
+@end
+
 
 @interface NodeAnimationHandler : NSObject
 

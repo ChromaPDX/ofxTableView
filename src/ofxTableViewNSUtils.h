@@ -11,6 +11,7 @@
 
 #pragma mark - UTILITY
 
+
 inline string cppString(NSString *s){
     
     return string([s cStringUsingEncoding:NSUTF8StringEncoding]);
