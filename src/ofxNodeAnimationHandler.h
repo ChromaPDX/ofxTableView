@@ -20,6 +20,10 @@ typedef NS_ENUM(NSInteger, NodeActionTimingMode) {
     NodeActionTimingEaseInEaseOut
 } NS_ENUM_AVAILABLE(10_9, 7_0);
 
+inline float weightedAverage (float src, float dst, float d);
+static inline float logAverage (float src, float dst, float d);
+static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d);
+
 //typedef bool (^ActionBlock)(NodeAction *action, float completion);
 typedef bool (^ActionBlock)(float completion);
 
@@ -40,6 +44,12 @@ typedef bool (^ActionBlock)(float completion);
 @property (nonatomic, strong) NSArray *children;
 @property (nonatomic, strong) NSMutableArray *actions;
 
+@property (nonatomic) ofPoint startPos;
+@property (nonatomic) ofPoint endPos;
+
+@property (nonatomic) bool reset;
+
+
 - (NodeAction *)reversedAction;
 
 - (void) runCompletion;
@@ -48,17 +58,18 @@ typedef bool (^ActionBlock)(float completion);
 
 // WISH LIST
 
-//+ (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec;
++ (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec;
++ (NodeAction *)moveBy:(CGVector)delta duration:(NSTimeInterval)sec;
+
++ (NodeAction *)moveToX:(CGFloat)x y:(CGFloat)y duration:(NSTimeInterval)sec;
+
++ (NodeAction *)moveTo:(CGPoint)location duration:(NSTimeInterval)sec;
++ (NodeAction *)moveToX:(CGFloat)x duration:(NSTimeInterval)sec;
++ (NodeAction *)moveToY:(CGFloat)y duration:(NSTimeInterval)sec;
 //
-//+ (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec;
-//+ (NodeAction *)moveBy:(CGVector)delta duration:(NSTimeInterval)sec;
-//+ (NodeAction *)moveTo:(CGPoint)location duration:(NSTimeInterval)sec;
-//+ (NodeAction *)moveToX:(CGFloat)x duration:(NSTimeInterval)sec;
-//+ (NodeAction *)moveToY:(CGFloat)y duration:(NSTimeInterval)sec;
-//
-//+ (NodeAction *)rotateByAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
-//+ (NodeAction *)rotateToAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
-//+ (NodeAction *)rotateToAngle:(CGFloat)radians duration:(NSTimeInterval)sec shortestUnitArc:(BOOL)shortestUnitArc;
++ (NodeAction *)rotateByAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
++ (NodeAction *)rotateToAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
++ (NodeAction *)rotateToAngle:(CGFloat)radians duration:(NSTimeInterval)sec shortestUnitArc:(BOOL)shortestUnitArc;
 //
 //+ (NodeAction *)resizeByWidth:(CGFloat)width height:(CGFloat)height duration:(NSTimeInterval)duration;
 //+ (NodeAction *)resizeToWidth:(CGFloat)width height:(CGFloat)height duration:(NSTimeInterval)duration;
@@ -78,8 +89,8 @@ typedef bool (^ActionBlock)(float completion);
 + (NodeAction *)group:(NSArray *)actions;
 
 
-//+ (NodeAction *)repeatAction:(NodeAction *)action count:(NSUInteger)count;
-//+ (NodeAction *)repeatActionForever:(NodeAction *)action;
++ (NodeAction *)repeatAction:(NodeAction *)action count:(NSUInteger)count;
++ (NodeAction *)repeatActionForever:(NodeAction *)action;
 //
 //+ (NodeAction *)fadeInWithDuration:(NSTimeInterval)sec;
 //+ (NodeAction *)fadeOutWithDuration:(NSTimeInterval)sec;

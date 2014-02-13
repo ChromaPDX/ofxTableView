@@ -8,21 +8,7 @@
 
 @implementation ScrollViewAction
 
-
-inline float weightedAverage (float src, float dst, float d){
-    
-    return src == dst ? src : ((src * (1.-d) + dst * d));
-    
-}
-
-inline float logAverage (float src, float dst, float d){
-    
-    return src == dst ? src : ((src * (1.- d*d) + dst * d * d));
-    
-}
-
-
-inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
+static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
     
     return frame3d(weightedAverage(src.x, dst.x, d),
                    weightedAverage(src.y, dst.y, d),

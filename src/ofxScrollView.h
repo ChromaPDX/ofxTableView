@@ -37,6 +37,7 @@
 #define DEFAULT_FONT_STRING "ofxTableViewDefault.ttf"
 #define DEFAULT_FONT_SIZE 16
 
+
 class    ofxScrollView;
 
 class frame3d {
@@ -111,6 +112,8 @@ class frame3d {
 
     
 };
+
+static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d);
 
 typedef enum ScrollPhase {
     ScrollPhaseNil,
