@@ -1,11 +1,13 @@
 ofxTableView
 ============
 
-a "UITableView" style api for Open Frameworks.
+a "UITableView" style api for Open Frameworks. (cross platform)
 
 TableViews and cells inherit from ofNode. Management including scrolling and modal transitions is provided.
 
-ofxNodeAnimationHandler + NodeAction provides block based animation system that conforms to SpriteKit API.
+ofxNodeAnimationHandler + NodeAction (ofxIOS only - objective-c based)
+
+provides block based animation system that conforms to SpriteKit API.
 
 TO DO:
 
@@ -13,7 +15,7 @@ TO DO:
 
 0% 'data source' for model objects / refresh controller not yet implemented.
 
-50% Working on Block animation system.
+75% Working on Block animation system.
 
 Dependencies + ackknowledgements :
 
