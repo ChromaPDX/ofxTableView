@@ -78,11 +78,10 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
 
 -(void)complete {
     
-   
-    
     if (_repeats == 0) {
         
         if (_completionBlock) {
+           
             _completionBlock();
         }
         
@@ -142,8 +141,8 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
-        
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
+
         if (action.reset) {
             action.startPos = action.node->getPosition();
             ofPoint p = action.node->getPosition();
@@ -151,11 +150,9 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
             action.reset = false;
         }
         
-        if (completion>1.) return 1;
         
-       action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
         
-        return 0;
+        action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
         
     };
     
@@ -173,7 +170,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
         
         if (action.reset) {
             action.startPos = action.node->getPosition();
@@ -181,12 +178,10 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
             action.endPos = ofPoint(x, y, p.z);
             action.reset = false;
         }
-        
-        if (completion>1.) return 1;
+
         
         action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
-        
-        return 0;
+
         
     };
     
@@ -202,7 +197,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
 + (NodeAction *)moveToX:(CGFloat)x duration:(NSTimeInterval)sec {
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
         
         if (action.reset) {
             action.startPos = action.node->getPosition();
@@ -211,11 +206,8 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
             action.reset = false;
         }
         
-        if (completion>1.) return 1;
-        
         action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
-        
-        return 0;
+
     };
     
     return action;
@@ -224,7 +216,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
 + (NodeAction *)moveToY:(CGFloat)y duration:(NSTimeInterval)sec {
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
         
         if (action.reset) {
             action.startPos = action.node->getPosition();
@@ -233,11 +225,8 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
             action.reset = false;
         }
         
-        if (completion>1.) return 1;
-        
         action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
-        
-        return 0;
+
         
     };
     
@@ -252,7 +241,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
         
         if (action.reset) {
             action.reset = false;
@@ -263,16 +252,9 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
         }
         
         ofQuaternion x;
-        
-        if (completion>=1.) {
-            x.slerp(1, action.startOrientation, action.endOrientation);
-            action.node->setOrientation(x);
-            return 1;
-        }
-        
         x.slerp(completion, action.startOrientation, action.endOrientation);
         action.node->setOrientation(x);
-        return 0;
+
         
     };
     
@@ -284,7 +266,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
         
         if (action.reset) {
 
@@ -297,17 +279,8 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
         }
         
         ofQuaternion x;
-        
-        if (completion >= 1.) {
-            x.slerp(1, action.startOrientation, action.endOrientation);
-            action.node->setOrientation(x);
-            return 1;
-        }
-        
         x.slerp(completion, action.startOrientation, action.endOrientation);
         action.node->setOrientation(x);
-
-        return 0;
         
     };
     
@@ -315,25 +288,41 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
 }
 
+#pragma mark - CUSTOM ACTIONS
+
++(NodeAction*)customActionWithDuration:(NSTimeInterval)seconds actionBlock:(void (^)(ofNode *, CGFloat))block {
+    
+    NodeAction * action = [[NodeAction alloc] initWithDuration:seconds];
+    
+    action.actionBlock = block;
+    
+    return action;
+    
+    
+}
+
 #pragma mark - UPDATE
 
 - (bool)updateWithTimeSinceLast:(NSTimeInterval) dt{
 
-    if (_actionBlock){
+    float completion = _progress / _duration;
+    
+    if (completion < 1.) {
         
-        float completion = _progress / _duration;
-        
-        //NSLog(@"action p: %f d: %f, c: %f",_progress,_duration, completion);
-
-        bool complete = _actionBlock(completion);
+        if (_actionBlock){
+            _actionBlock(_node, completion);
+        }
         
         _progress += dt;
         
-        return complete;
+        return 0;
         
     }
-    
-    return 1;
+    else {
+        _actionBlock(_node, 1);
+        return 1;
+    }
+
 }
 
 

@@ -45,8 +45,7 @@ inline float weightedAverage (float src, float dst, float d);
 static inline float logAverage (float src, float dst, float d);
 static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d);
 
-//typedef bool (^ActionBlock)(NodeAction *action, float completion);
-typedef bool (^ActionBlock)(float completion);
+typedef void (^ActionBlock)(ofNode *node, float completion);
 
 @interface NodeAction : NSObject
 
@@ -148,7 +147,7 @@ typedef bool (^ActionBlock)(float completion);
 //
 //+ (NodeAction *)runAction:(NodeAction *)action onChildWithName:(NSString*)name;
 //
-//+ (NodeAction *)customActionWithDuration:(NSTimeInterval)seconds actionBlock:(void (^)(ofNode *node, NSTimeInterval dt))block;
++ (NodeAction *)customActionWithDuration:(NSTimeInterval)seconds actionBlock:(void (^)(ofNode *node, CGFloat elapsedTime))block;
 
 @end
 

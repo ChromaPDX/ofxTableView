@@ -25,9 +25,7 @@ static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
     action.style = style;
     action.duration = duration;
     
-    //action.actionBlock = (ActionBlock)^(ScrollViewAction* action, float completion){
-    
-    action.actionBlock = (ActionBlock)^(float completion){
+    action.actionBlock = (ActionBlock)^(ofNode* node, float completion){
         
         //NSLog(@"start of block");
         
@@ -56,7 +54,7 @@ static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
                 break;
         }
         
-        if (completion > 1.){
+        if (completion == 1){
             
             ((ofxScrollView*)action.node)->setFrame(action.destFrame);
             
@@ -80,13 +78,9 @@ static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
             
             NSLog(@"end of block");
             
-            return 1;
             
         }
-        
-        return 0;
-        
-        
+
         
     };
     

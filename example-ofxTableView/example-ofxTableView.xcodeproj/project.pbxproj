@@ -19,6 +19,7 @@
 		53F323EB10A20EDB00E0DAE4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */; };
 		613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */; };
 		61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61860D9318984BC400CFEE44 /* ucontainer.cpp */; };
+		618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
 		678E130A17951536005B6D19 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130917951536005B6D19 /* Icon.png */; };
 		678E130C1795153C005B6D19 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130B1795153C005B6D19 /* Default.png */; };
@@ -75,6 +76,8 @@
 		61860D9218984BC400CFEE44 /* ofxTableViewNSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTableViewNSUtils.h; sourceTree = "<group>"; };
 		61860D9318984BC400CFEE44 /* ucontainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ucontainer.cpp; sourceTree = "<group>"; };
 		61860D9418984BC400CFEE44 /* ucontainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ucontainer.h; sourceTree = "<group>"; };
+		618DABBD18ADA16A001009CA /* ofxSpriteNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxSpriteNode.h; sourceTree = "<group>"; };
+		618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxSpriteNode.mm; sourceTree = "<group>"; };
 		678E130717951530005B6D19 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "bin/data/Icon@2x.png"; sourceTree = "<group>"; };
 		678E130917951536005B6D19 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = bin/data/Icon.png; sourceTree = "<group>"; };
 		678E130B1795153C005B6D19 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = bin/data/Default.png; sourceTree = "<group>"; };
@@ -156,6 +159,8 @@
 				29B39F021894C57C00814331 /* ofxTableViewCell.mm */,
 				29B39F031894C57C00814331 /* ofxTableViewController.h */,
 				29B39F041894C57C00814331 /* ofxTableViewController.mm */,
+				618DABBD18ADA16A001009CA /* ofxSpriteNode.h */,
+				618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -377,6 +382,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29B39F151894C57C00814331 /* ofxScrollView.mm in Sources */,
+				618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */,
 				E4D8936E11527B74007E1F53 /* main.mm in Sources */,
 				29B39F171894C57C00814331 /* ofxTableViewCell.mm in Sources */,
 				29B39F161894C57C00814331 /* ofxTableView.mm in Sources */,
