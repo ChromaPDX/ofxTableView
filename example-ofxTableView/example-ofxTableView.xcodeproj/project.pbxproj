@@ -17,6 +17,8 @@
 		29B39F181894C57C00814331 /* ofxTableViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B39F041894C57C00814331 /* ofxTableViewController.mm */; };
 		5326AEA810A23A0500278DE6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5326AEA710A23A0500278DE6 /* CoreLocation.framework */; };
 		53F323EB10A20EDB00E0DAE4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */; };
+		6136B14418B2ECD700ED43AC /* ofxSceneNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */; };
+		6136B14718B2ECE300ED43AC /* ofxNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6136B14618B2ECE300ED43AC /* ofxNode.mm */; };
 		613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */; };
 		61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61860D9318984BC400CFEE44 /* ucontainer.cpp */; };
 		618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */; };
@@ -71,6 +73,10 @@
 		5326AEA710A23A0500278DE6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		533A9201BFCAA6F93D776874 /* ofxMultiTouch.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxMultiTouch.cpp; path = ../../ofxMultiTouch/src/ofxMultiTouch.cpp; sourceTree = SOURCE_ROOT; };
 		53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		6136B14218B2ECD700ED43AC /* ofxSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxSceneNode.h; sourceTree = "<group>"; };
+		6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxSceneNode.mm; sourceTree = "<group>"; };
+		6136B14518B2ECE300ED43AC /* ofxNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNode.h; sourceTree = "<group>"; };
+		6136B14618B2ECE300ED43AC /* ofxNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxNode.mm; sourceTree = "<group>"; };
 		613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxNodeAnimationHandler.mm; sourceTree = "<group>"; };
 		613C648518AAF4CA0067D312 /* ofxNodeAnimationHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNodeAnimationHandler.h; sourceTree = "<group>"; };
 		61860D9218984BC400CFEE44 /* ofxTableViewNSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTableViewNSUtils.h; sourceTree = "<group>"; };
@@ -159,6 +165,10 @@
 				29B39F021894C57C00814331 /* ofxTableViewCell.mm */,
 				29B39F031894C57C00814331 /* ofxTableViewController.h */,
 				29B39F041894C57C00814331 /* ofxTableViewController.mm */,
+				6136B14218B2ECD700ED43AC /* ofxSceneNode.h */,
+				6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */,
+				6136B14518B2ECE300ED43AC /* ofxNode.h */,
+				6136B14618B2ECE300ED43AC /* ofxNode.mm */,
 				618DABBD18ADA16A001009CA /* ofxSpriteNode.h */,
 				618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */,
 			);
@@ -388,8 +398,10 @@
 				29B39F161894C57C00814331 /* ofxTableView.mm in Sources */,
 				E4D8936F11527B74007E1F53 /* testApp.mm in Sources */,
 				29B39F181894C57C00814331 /* ofxTableViewController.mm in Sources */,
+				6136B14718B2ECE300ED43AC /* ofxNode.mm in Sources */,
 				104880F75437BBEC8B04A578 /* ofxMultiTouch.cpp in Sources */,
 				613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */,
+				6136B14418B2ECD700ED43AC /* ofxSceneNode.mm in Sources */,
 				61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

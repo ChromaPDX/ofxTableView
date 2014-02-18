@@ -1,5 +1,5 @@
 #include "testApp.h"
-
+#import "ofxSpriteNode.h"
 
 // HERE IS AN EXAMPLE SUBCLASS OF A TABLE VIEW CELL
 
@@ -39,7 +39,6 @@ public:
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    
     
     // INIT VIEW CONTROLLER, HANDLES TOUCHES
     
@@ -122,135 +121,137 @@ void testApp::setup(){
               ]];
             
         }];
-            // 4 // CUSTOM CELL SUBCLASS
-            
-            myCustomCell *newCell = new myCustomCell;
-            
-            nestedTable->addCustomCell(newCell, .25);
-            
-            newCell->drawsBorder = false;
-        }
-         
-         // 5 // MODAL TABLE
-         
-         ofxTableViewCell *modal = tbv->addCellWithStyle(ofxTableViewCellStyleModal, .25);
-         
-         modal->addCellWithLabel("MODAL TABLE", 1.);
-         
-         modal->transitionStyle = TransitionStyleZoomIn;
-         modal->transitionTime = 1.5;
-         
-         // add table first
-         
-         modalTable = new ofxTableView;
-         
-         modalTable->initWithParent(modal, modal->getFrame());
-         modalTable->isModal = true;
-         modal->addChild(modalTable);
-         
-         ofxTableViewCell *back = modalTable->addCellWithStyle(ofxTableViewCellStyleModal, .25);
-         
-         back->addCellWithLabel("BACK", 1.);
-         
-         back->transitionStyle = TransitionStyleZoomOut;
-         back->transitionTime = 1.;
-         
-         // Create back button
-         
-         for (int i = 0; i < 10 + 1; i++) {
-             
-             modalTable->addCellWithLabel("table cell " + ofToString(i), .25);
-             
-         }
-         
-         
-         
-         
-         }
-         
-         void testApp::cellWasSelected(ofxTableViewCell *cell){
-             
-             ofLogNotice("tableView") << "selected section: " + ofToString(cell->getIndexPath()[0]) + " index: " + ofToString(cell->getIndexPath()[1]);
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::update(){
-             
-             if (dir){
-                 if (rot < 30) rot+=.1; else dir=0;
-             }
-             else {
-                 if (rot > -30) rot-=.1; else dir=1;
-             }
-             
-             
-             
-             spin < 360 ? spin ++ : spin = 0;
-             
-             
-             vc->update();
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::draw(){
-             ofPushMatrix();
-             
-             ofTranslate(ofGetWidth()/2., ofGetHeight()/2.);
-             glRotatef(rot, 0, 1, 0);
-             
-             vc->draw();
-             
-             ofPopMatrix();
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::exit(){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::touchDown(ofTouchEventArgs & touch){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::touchMoved(ofTouchEventArgs & touch){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::touchUp(ofTouchEventArgs & touch){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::touchDoubleTap(ofTouchEventArgs & touch){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::touchCancelled(ofTouchEventArgs & touch){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::lostFocus(){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::gotFocus(){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::gotMemoryWarning(){
-             
-         }
-         
-         //--------------------------------------------------------------
-         void testApp::deviceOrientationChanged(int newOrientation){
-             
-         }
+        // 4 // CUSTOM CELL SUBCLASS
+        
+        myCustomCell *newCell = new myCustomCell;
+        
+        nestedTable->addCustomCell(newCell, .25);
+        
+        newCell->drawsBorder = false;
+    }
+    
+    // 5 // MODAL TABLE
+    
+    ofxTableViewCell *modal = tbv->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    modal->addCellWithLabel("MODAL TABLE", 1.);
+    
+    modal->transitionStyle = TransitionStyleZoomIn;
+    modal->transitionTime = 1.5;
+    
+    // add table first
+    
+    modalTable = new ofxTableView;
+    
+    modalTable->initWithParent(modal, modal->getFrame());
+    modalTable->isModal = true;
+    modal->addChild(modalTable);
+    
+    ofxTableViewCell *back = modalTable->addCellWithStyle(ofxTableViewCellStyleModal, .25);
+    
+    back->addCellWithLabel("BACK", 1.);
+    
+    back->transitionStyle = TransitionStyleZoomOut;
+    back->transitionTime = 1.;
+    
+    // Create back button
+    
+    for (int i = 0; i < 10 + 1; i++) {
+        
+        modalTable->addCellWithLabel("table cell " + ofToString(i), .25);
+        
+    }
+    
+    
+    testSprite = [[ofxSpriteNode alloc] initWithImageNamed:@"Icon@2x.png"];
+    [testSprite runAction:[NodeAction rotateByAngle:20 duration:.3]];
+    
+    
+}
+
+void testApp::cellWasSelected(ofxTableViewCell *cell){
+    
+    ofLogNotice("tableView") << "selected section: " + ofToString(cell->getIndexPath()[0]) + " index: " + ofToString(cell->getIndexPath()[1]);
+    
+}
+
+//--------------------------------------------------------------
+void testApp::update(){
+    
+    if (dir){
+        if (rot < 30) rot+=.1; else dir=0;
+    }
+    else {
+        if (rot > -30) rot-=.1; else dir=1;
+    }
+    
+    
+    
+    spin < 360 ? spin ++ : spin = 0;
+    
+    
+    vc->update();
+    
+}
+
+//--------------------------------------------------------------
+void testApp::draw(){
+    ofPushMatrix();
+    
+    ofTranslate(ofGetWidth()/2., ofGetHeight()/2.);
+    glRotatef(rot, 0, 1, 0);
+    
+    vc->draw();
+    
+    ofPopMatrix();
+}
+
+//--------------------------------------------------------------
+void testApp::exit(){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::touchDown(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::touchMoved(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::touchUp(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::touchDoubleTap(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::touchCancelled(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::lostFocus(){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::gotFocus(){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::gotMemoryWarning(){
+    
+}
+
+//--------------------------------------------------------------
+void testApp::deviceOrientationChanged(int newOrientation){
+    
+}

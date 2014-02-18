@@ -5,6 +5,8 @@
 #include "ofxiOSExtras.h"
 #include "ofxTableView.h"
 
+@class ofxSpriteNode;
+
 class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     public:
@@ -40,6 +42,8 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
     // TABLE VIEW DELEGATE
     
     void cellWasSelected(ofxTableViewCell *cell);
+    
+    ofxSpriteNode *testSprite;
     
 };
 

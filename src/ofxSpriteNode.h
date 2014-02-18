@@ -6,15 +6,13 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "ofMain.h"
+#import "ofxNode.h"
 
-@class NodeAnimationHandler;
+@interface ofxSpriteNode : ofxNode
 
-@interface ofxSpriteNode : NSObject
+@property (nonatomic) ofPlanePrimitive spriteNode;
 
-@property (nonatomic) ofPlanePrimitive sprite;
-@property (nonatomic, strong) NodeAnimationHandler *animationHandler;
+// INIT
 
 + (instancetype)spriteNodeWithTexture:(ofTexture)texture size:(CGSize)size;
 + (instancetype)spriteNodeWithTexture:(ofTexture)texture;
@@ -26,11 +24,14 @@
 - (instancetype)initWithImageNamed:(NSString *)name;
 - (instancetype)initWithColor:(ofColor)color size:(CGSize)size;
 
+// ACTIONS
+
+
+
 @property (nonatomic) ofTexture texture;
 @property (nonatomic) ofRectangle centerRect;
 @property (nonatomic) float colorBlendFactor;
 @property (nonatomic) ofColor color;
-@property (nonatomic) ofBlendMode blendMode;
 @property (nonatomic) ofPoint anchorPoint;
 @property (nonatomic) CGSize size;
 

@@ -35,7 +35,7 @@
     self = [super init];
     if (self) {
         _texture = texture;
-        _animationHandler = [[NodeAnimationHandler alloc] init];
+        animationHandler = [[NodeAnimationHandler alloc] init];
         _size = size;
         _color = color;
     }
@@ -56,6 +56,16 @@
 
 - (instancetype)initWithColor:(ofColor)color size:(CGSize)size {
     return [self initWithTexture:ofTexture() color:color size:CGSizeMake(_texture.getWidth(),_texture.getHeight())];
+}
+
+// DRAW
+
+- (void)updateWithTimeSinceLast:(NSTimeInterval) dt {
+    
+}
+
+-(void)draw {
+
 }
 
 @end
