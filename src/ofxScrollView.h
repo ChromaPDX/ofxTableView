@@ -32,11 +32,9 @@
 #define  ofxScrollView_H_INCLUDED
 
 #include "ofMain.h"
-#import "ofxNodeAnimationHandler.h"
 
 #define DEFAULT_FONT_STRING "ofxTableViewDefault.ttf"
 #define DEFAULT_FONT_SIZE 16
-
 
 class    ofxScrollView;
 
@@ -81,39 +79,32 @@ class frame3d {
         return *this;
     }
     
-    float getWidth() const{
+    float getWidth(){
         return w;
     }
-    float getHeight() const{
+    float getHeight(){
         return h;
     }
     
-    void setPosition(ofPoint position){
-        x = position.x;
-        y = position.y;
-        z = position.z;
-    }
-    
-    ofPoint getPosition() const{
+    ofPoint getPosition() {
         return ofPoint(x,y,z);
     }
     
-    ofPoint getSize() const{
+    ofPoint getSize(){
         return ofPoint(w,h);
     }
     
-    ofPoint getCenter() const{
+    ofPoint getCenter(){
         return ofPoint(x+w/2.,y+h/2.,z);
     }
     
-    ofRectangle getBounds() const{
+    ofRectangle getBounds(){
         return ofRectangle(0,0,w,h);
     }
-
+    
+    
     
 };
-
-static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d);
 
 typedef enum ScrollPhase {
     ScrollPhaseNil,
@@ -136,22 +127,32 @@ typedef enum TransitionStyle {
     TransitionStyleFade
 } TransitionStyle;
 
-@interface ScrollViewAction : NodeAction
 
+class    ofxScrollViewAnimation
 {
-    int scrollPosition;
-}
-
-@property (nonatomic) frame3d sourceFrame;
-@property (nonatomic) frame3d destFrame;
-@property (nonatomic) TransitionStyle style;
-@property (nonatomic) float srcAlpha;
-@property (nonatomic) float dstAlpha;
-
-+(ScrollViewAction*)TransitionWithStyle:(TransitionStyle) style Duration:(NSTimeInterval)duration;
-
-@end
-
+    
+public:
+    
+    int scrollPosition = 0;
+    
+    bool completed = false;
+    
+    long long startTime = 0;
+    long long duration = 0;
+    
+    float completion = 0;
+    
+    float srcAlpha = 1.;
+    float dstAlpha = 1.;
+    
+    frame3d sourceFrame;
+    frame3d destFrame;
+    
+    ofxScrollView* cellRef;
+    
+    TransitionStyle style;
+    
+};
 
 class    ofxScrollView : public ofNode
 {
@@ -162,9 +163,9 @@ private:
 protected:
     
     frame3d myFrame;
-    frame3d oldFrame;
     
-    ofPoint animatedOffset;
+    
+    float alpha;
     
     int             _xRootOffset;
     int             _yRootOffset;
@@ -201,11 +202,10 @@ protected:
     
     ofFbo           raster;
     
-    
+    ofxScrollView * _parent = NULL;
     vector<ofxScrollView *> children;
     
-    //vector<ScrollViewAnimation *> animations;
-   
+    vector<ofxScrollViewAnimation *> animations;
 
     bool            highlighted = false;
     
@@ -213,7 +213,6 @@ public:
     ofxScrollView();                           //constructor
     ~ ofxScrollView();                          //destructor
     
-    ofxScrollView * _parent = NULL;
     //METHODS:--------------------------------------------------------
     
     // METHODS TO BE CALLED BY SUBCLASSES
@@ -248,9 +247,9 @@ public:
     
     void                    pushModalView(ofxScrollView *child, TransitionStyle transitionStyle, float durationSec);
     void                    popModalView(TransitionStyle transitionStyle,float durationSec);
+    void                    updateAnimation(ofxScrollViewAnimation *anim);
     
     ofNode*                 getParent();
-    void                    setParent(ofxScrollView* parent);
     
     ofxScrollView*          getRoot();
     
@@ -267,16 +266,14 @@ public:
     
     // METHODS TO OVERRIDE
 
-    NodeAnimationHandler *animationHandler;
-    
     frame3d cachedFrame;
     ofQuaternion cachedOrientation;
     
-    double lastTime;
-
+    void                    setParent(ofxScrollView* parent);
+    
     virtual void            draw();
     
-    void                    setChildFrame(ofxScrollView *view);
+    void                setChildFrame(ofxScrollView *view);
     
     virtual bool            containsPoint(int x, int y);           //check to see if mouse is within boundaries of this panel.
     
@@ -289,15 +286,12 @@ public:
     
     
     void scaleFrame(float scale);
-
-    
-    // INHERITED FROM OF NODE
-
-    // PUBLIC SCALAR PROPERTIES
-    
     float _scale = 1.;
     
-    float alpha;
+    // INHERITED FROM OF NODE
+    
+    
+    // PUBLIC SCALAR PROPERTIES
     
     string          displayName = "null";
     
@@ -309,7 +303,9 @@ public:
     bool            drawsName = false;
     bool            scrollDirectionVertical = true;
     bool            scrollingEnabled = false;
+   
     bool            shouldRasterize = false;
+    
     bool            clipToBounds = false;
     bool            isModal = false;
     
@@ -348,6 +344,8 @@ public:
     void setBgColor(ofColor color);
     void setFgColor(float* color);
     void setFgColor(ofColor color);
+    
+    
     
 };
 

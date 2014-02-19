@@ -238,7 +238,8 @@ int* ofxTableViewCell::getIndexPath(){
 
 void    ofxTableViewCell::draw()
 {
-    
+   // ofLog(OF_LOG_NOTICE, "in ofxTableViewCell::draw");
+
     
     if (!hidden) {
         
@@ -474,7 +475,10 @@ void ofxTableViewCell::setImageFromDisk(string filename){
     
 }
 
-
+void toggleSelected(){
+    
+    
+}
 
 void ofxTableViewCell::setArray(vector<int> array){
     

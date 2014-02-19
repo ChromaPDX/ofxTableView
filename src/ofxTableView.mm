@@ -36,7 +36,7 @@ void ofxTableView::initWithParent(ofxScrollView *nparent, frame3d frame) {
     hidden = false;
     drawsBorder = true;
     scrollingEnabled = true;
-    scrollDirectionVertical = true;
+    scrollDirectionVertical = TRUE;
     horizontalPadding = 0;
     verticalPadding = 5*getScreenScale();
     
@@ -131,7 +131,7 @@ void ofxTableView::addDataSourceForCell(ofxTableViewCell *cell){
 
 void ofxTableView::draw(){
     
-
+  //  ofLog(OF_LOG_NOTICE, "in ofxTableView::draw");
     
     if (!raster.isAllocated()) {
         raster.allocate(myFrame.w, myFrame.h);
@@ -165,7 +165,7 @@ void ofxTableView::draw(){
         
             // CUSTOM DRAW CODE
         
-            //NSLog(@"drawLocation: P: %f %f %f S: %f %f", getX(), getY(),getZ(),getWidth(),getHeight());
+         //   NSLog(@"drawLocation: P: %f %f %f S: %f %f", getX(), getY(),getZ(),getWidth(),getHeight());
             
             ofxScrollView::end();
             
