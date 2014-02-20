@@ -23,6 +23,8 @@
 		613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */; };
 		61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61860D9318984BC400CFEE44 /* ucontainer.cpp */; };
 		618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */; };
+		6190F1F618B5AAB500FCBC53 /* ofxTableViewCellCard.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6190F1F518B5AAB500FCBC53 /* ofxTableViewCellCard.mm */; };
+		6190F22E18B5AAFF00FCBC53 /* ofxImageSequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6190F21718B5AAFF00FCBC53 /* ofxImageSequence.cpp */; };
 		61F0E70E18B4249D008F6C97 /* nodeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 61F0E70C18B4249D008F6C97 /* nodeTest.mm */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
 		678E130A17951536005B6D19 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130917951536005B6D19 /* Icon.png */; };
@@ -88,6 +90,10 @@
 		61860D9418984BC400CFEE44 /* ucontainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ucontainer.h; sourceTree = "<group>"; };
 		618DABBD18ADA16A001009CA /* ofxSpriteNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxSpriteNode.h; sourceTree = "<group>"; };
 		618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxSpriteNode.mm; sourceTree = "<group>"; };
+		6190F1F418B5AAB500FCBC53 /* ofxTableViewCellCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTableViewCellCard.h; sourceTree = "<group>"; };
+		6190F1F518B5AAB500FCBC53 /* ofxTableViewCellCard.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxTableViewCellCard.mm; sourceTree = "<group>"; };
+		6190F21718B5AAFF00FCBC53 /* ofxImageSequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxImageSequence.cpp; sourceTree = "<group>"; };
+		6190F21818B5AAFF00FCBC53 /* ofxImageSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxImageSequence.h; sourceTree = "<group>"; };
 		61F0E70B18B41CBA008F6C97 /* ofxNodeKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxNodeKit.h; sourceTree = "<group>"; };
 		61F0E70C18B4249D008F6C97 /* nodeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nodeTest.mm; sourceTree = "<group>"; };
 		61F0E70D18B4249D008F6C97 /* nodeTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nodeTest.h; sourceTree = "<group>"; };
@@ -170,6 +176,8 @@
 				29B39F001894C57C00814331 /* ofxTableView.mm */,
 				29B39F011894C57C00814331 /* ofxTableViewCell.h */,
 				29B39F021894C57C00814331 /* ofxTableViewCell.mm */,
+				6190F1F418B5AAB500FCBC53 /* ofxTableViewCellCard.h */,
+				6190F1F518B5AAB500FCBC53 /* ofxTableViewCellCard.mm */,
 				29B39F031894C57C00814331 /* ofxTableViewController.h */,
 				29B39F041894C57C00814331 /* ofxTableViewController.mm */,
 				6136B14218B2ECD700ED43AC /* ofxSceneNode.h */,
@@ -222,6 +230,24 @@
 			name = "core frameworks";
 			sourceTree = "<group>";
 		};
+		6190F1F718B5AAFF00FCBC53 /* ofxImageSequence */ = {
+			isa = PBXGroup;
+			children = (
+				6190F21618B5AAFF00FCBC53 /* src */,
+			);
+			name = ofxImageSequence;
+			path = ../../ofxImageSequence;
+			sourceTree = "<group>";
+		};
+		6190F21618B5AAFF00FCBC53 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6190F21718B5AAFF00FCBC53 /* ofxImageSequence.cpp */,
+				6190F21818B5AAFF00FCBC53 /* ofxImageSequence.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		7489D64FE68197B93601690A /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -243,6 +269,7 @@
 		BB16F26B0F2B646B00518274 /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				6190F1F718B5AAFF00FCBC53 /* ofxImageSequence */,
 				29B39EE21894C57B00814331 /* ofxTableView */,
 				C3ED8BE3CB1C4D6B5F8DAD0B /* ofxMultiTouch */,
 			);
@@ -403,7 +430,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6190F1F618B5AAB500FCBC53 /* ofxTableViewCellCard.mm in Sources */,
 				29B39F151894C57C00814331 /* ofxScrollView.mm in Sources */,
+				6190F22E18B5AAFF00FCBC53 /* ofxImageSequence.cpp in Sources */,
 				618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */,
 				6136B14A18B409A100ED43AC /* ofxScrollNode.mm in Sources */,
 				E4D8936E11527B74007E1F53 /* main.mm in Sources */,
