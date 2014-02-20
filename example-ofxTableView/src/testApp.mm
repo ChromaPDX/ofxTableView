@@ -93,35 +93,35 @@ void testApp::setup(){
         
         // DO SOME ANIMATION
         
-        [picture->animationHandler runAction:[NodeAction repeatAction: [NodeAction sequence:@[[NodeAction group:@[
-                                                                                                                  [NodeAction rotateByAngle:110 duration:.6],
-                                                                                                                  [NodeAction moveByX:80 y:0 duration:.4],
-                                                                                                                  [NodeAction moveByX:0 y:-90 duration:.4]]],
-                                                                                              [NodeAction group:@[
-                                                                                                                  [NodeAction rotateByAngle:-30 duration:.2],
-                                                                                                                  [NodeAction moveByX:-160 y:0 duration:.4],
-                                                                                                                  [NodeAction moveByX:80 y:0 duration:.4],
-                                                                                                                  [NodeAction moveByX:0 y:90 duration:.4]]]
-                                                                                              ]]
-                                                                count:4] completion:^{
-            
-            
-            [picture->animationHandler runAction:
-             [NodeAction repeatActionForever:
-              [NodeAction group:@[
-                                  [NodeAction customActionWithDuration:1. actionBlock:^(ofNode* node, float completion){
-                  
-                  picture->setBgColor(ofColor(rand()%255, rand()%255, rand()%255, completion*255.));
-                  
-                  
-              }],
-                                  [NodeAction rotateByAngle:220 duration:1.]
-                                  
-                                  ]]
-              
-              ]];
-            
-        }];
+//        [picture->animationHandler runAction:[NodeAction repeatAction: [NodeAction sequence:@[[NodeAction group:@[
+//                                                                                                                  [NodeAction rotateByAngle:110 duration:.6],
+//                                                                                                                  [NodeAction moveByX:80 y:0 duration:.4],
+//                                                                                                                  [NodeAction moveByX:0 y:-90 duration:.4]]],
+//                                                                                              [NodeAction group:@[
+//                                                                                                                  [NodeAction rotateByAngle:-30 duration:.2],
+//                                                                                                                  [NodeAction moveByX:-160 y:0 duration:.4],
+//                                                                                                                  [NodeAction moveByX:80 y:0 duration:.4],
+//                                                                                                                  [NodeAction moveByX:0 y:90 duration:.4]]]
+//                                                                                              ]]
+//                                                                count:4] completion:^{
+//            
+//            
+//            [picture->animationHandler runAction:
+//             [NodeAction repeatActionForever:
+//              [NodeAction group:@[
+//                                  [NodeAction customActionWithDuration:1. actionBlock:^(ofNode* node, float completion){
+//                  
+//                  picture->setBgColor(ofColor(rand()%255, rand()%255, rand()%255, completion*255.));
+//                  
+//                  
+//              }],
+//                                  [NodeAction rotateByAngle:220 duration:1.]
+//                                  
+//                                  ]]
+//              
+//              ]];
+//        
+//        }];
         // 4 // CUSTOM CELL SUBCLASS
         
         myCustomCell *newCell = new myCustomCell;

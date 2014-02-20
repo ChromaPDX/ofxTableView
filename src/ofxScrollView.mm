@@ -295,6 +295,9 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     animations.push_back(currentAnimation);
     child->animations.push_back(childAnimation);
     
+    child->clearParent();
+
+    
     
 }
 
