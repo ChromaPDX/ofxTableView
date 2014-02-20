@@ -25,6 +25,8 @@
 		618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */; };
 		6190F1F618B5AAB500FCBC53 /* ofxTableViewCellCard.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6190F1F518B5AAB500FCBC53 /* ofxTableViewCellCard.mm */; };
 		6190F22E18B5AAFF00FCBC53 /* ofxImageSequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6190F21718B5AAFF00FCBC53 /* ofxImageSequence.cpp */; };
+		61D5B70218B6B262001B9271 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61D5B70118B6B262001B9271 /* CoreMotion.framework */; };
+		61D5B70518B6B985001B9271 /* ofxPrimitiveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 61D5B70418B6B985001B9271 /* ofxPrimitiveNode.mm */; };
 		61F0E70E18B4249D008F6C97 /* nodeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 61F0E70C18B4249D008F6C97 /* nodeTest.mm */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
 		678E130A17951536005B6D19 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130917951536005B6D19 /* Icon.png */; };
@@ -94,6 +96,9 @@
 		6190F1F518B5AAB500FCBC53 /* ofxTableViewCellCard.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxTableViewCellCard.mm; sourceTree = "<group>"; };
 		6190F21718B5AAFF00FCBC53 /* ofxImageSequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxImageSequence.cpp; sourceTree = "<group>"; };
 		6190F21818B5AAFF00FCBC53 /* ofxImageSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxImageSequence.h; sourceTree = "<group>"; };
+		61D5B70118B6B262001B9271 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		61D5B70318B6B985001B9271 /* ofxPrimitiveNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPrimitiveNode.h; sourceTree = "<group>"; };
+		61D5B70418B6B985001B9271 /* ofxPrimitiveNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxPrimitiveNode.mm; sourceTree = "<group>"; };
 		61F0E70B18B41CBA008F6C97 /* ofxNodeKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxNodeKit.h; sourceTree = "<group>"; };
 		61F0E70C18B4249D008F6C97 /* nodeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nodeTest.mm; sourceTree = "<group>"; };
 		61F0E70D18B4249D008F6C97 /* nodeTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nodeTest.h; sourceTree = "<group>"; };
@@ -126,6 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61D5B70218B6B262001B9271 /* CoreMotion.framework in Frameworks */,
 				E41D421413B3A95300A75A5D /* libofxiOS_iphoneos_Debug.a in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -185,6 +191,8 @@
 				61F0E70B18B41CBA008F6C97 /* ofxNodeKit.h */,
 				6136B14518B2ECE300ED43AC /* ofxNode.h */,
 				6136B14618B2ECE300ED43AC /* ofxNode.mm */,
+				61D5B70318B6B985001B9271 /* ofxPrimitiveNode.h */,
+				61D5B70418B6B985001B9271 /* ofxPrimitiveNode.mm */,
 				618DABBD18ADA16A001009CA /* ofxSpriteNode.h */,
 				618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */,
 				6136B14818B409A100ED43AC /* ofxScrollNode.h */,
@@ -196,6 +204,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				61D5B70118B6B262001B9271 /* CoreMotion.framework */,
 				678E130917951536005B6D19 /* Icon.png */,
 				678E130717951530005B6D19 /* Icon@2x.png */,
 				678E130B1795153C005B6D19 /* Default.png */,
@@ -435,6 +444,7 @@
 				6190F22E18B5AAFF00FCBC53 /* ofxImageSequence.cpp in Sources */,
 				618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */,
 				6136B14A18B409A100ED43AC /* ofxScrollNode.mm in Sources */,
+				61D5B70518B6B985001B9271 /* ofxPrimitiveNode.mm in Sources */,
 				E4D8936E11527B74007E1F53 /* main.mm in Sources */,
 				29B39F171894C57C00814331 /* ofxTableViewCell.mm in Sources */,
 				29B39F161894C57C00814331 /* ofxTableView.mm in Sources */,
@@ -473,7 +483,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ofxiOS_Prefix.pch;
 				INFOPLIST_FILE = "ofxiOS-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/leif/Code/of_v0.8.0_ios_release/libs/openFrameworksCompiled/lib/ios,
@@ -497,7 +507,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ofxiOS_Prefix.pch;
 				INFOPLIST_FILE = "ofxiOS-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/leif/Code/of_v0.8.0_ios_release/libs/openFrameworksCompiled/lib/ios,

@@ -8,6 +8,9 @@
 
 #import "ofxSceneNode.h"
 
+#define DEFAULT_FONT_STRING "ofxTableViewDefault.ttf"
+#define DEFAULT_FONT_SIZE 16
+
 typedef enum ScrollPhase {
     ScrollPhaseNil,
     ScrollPhaseBegan,
@@ -29,7 +32,7 @@ typedef enum TransitionStyle {
     TransitionStyleFade
 } TransitionStyle;
 
-@interface ofxScrollNode : ofxSceneNode
+@interface ofxScrollNode : ofxSpriteNode
 
 { // private
     
@@ -37,7 +40,7 @@ typedef enum TransitionStyle {
     
     // Touch Handliing
     
-    bool fdirty;
+ 
     bool cdirty;
     
     int contentSize;
@@ -58,10 +61,6 @@ typedef enum TransitionStyle {
     float alpha;
 
     
-    int             referenceId ;
-    int             displayId;
-
-    bool            scrollDirectionVertical;
     bool            scrollingEnabled;
     bool            shouldRasterize;
     bool            clipToBounds;
@@ -69,22 +68,27 @@ typedef enum TransitionStyle {
     
     int             verticalPadding;
     int             horizontalPadding;
-    
-   
-    
-    float           autoSizePct;
-    
+
     int             scrollPostion;
 
     
 }
+
+// INIT
+
+-(instancetype) initWithParent:(ofxScrollNode *)parent autoSizePct:(float)autoSizePct;
+
+@property    (nonatomic) ofTrueTypeFont *sharedFont;
 
 // Scroll
 
 @property    (nonatomic) bool            highlighted;
 @property    (nonatomic) ScrollPhase scrollPhase;
 @property   (nonatomic) float scrollPosition;
-
+@property   (nonatomic) float autoSizePct;
+@property   (nonatomic)  int displayId;
+@property   (nonatomic) bool            scrollDirectionVertical;
+@property   (nonatomic)   bool fdirty;
 -(void) setScrollPosition:(int) offset animated:(bool) animated;
 
 // Getter based properties

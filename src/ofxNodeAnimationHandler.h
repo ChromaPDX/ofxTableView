@@ -78,7 +78,17 @@ typedef void (^ActionBlock)(ofNode *node, float completion);
 
 - (bool)updateWithTimeSinceLast:(NSTimeInterval) dt;
 
-// WISH LIST
+
+// 3D Additions
+
++ (NodeAction *)move3dByX:(CGFloat)x Y:(CGFloat)y Z:(CGFloat)z duration:(NSTimeInterval)sec;
++ (NodeAction *)move3dBy:(ofVec3f)delta duration:(NSTimeInterval)sec;
+
++(NodeAction *)rotateXByAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
++(NodeAction *)rotateYByAngle:(CGFloat)radians duration:(NSTimeInterval)sec;
++(NodeAction *)rotate3dByAngle:(ofVec3f)angles duration:(NSTimeInterval)sec;
+
+// SK Compatibility list
 
 + (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec;
 + (NodeAction *)moveBy:(CGVector)delta duration:(NSTimeInterval)sec;

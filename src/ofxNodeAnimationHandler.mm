@@ -135,28 +135,11 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
 }
 
 
-#pragma mark - MOVE
+#pragma mark - MOVE BY
 
 + (NodeAction *)moveByX:(CGFloat)deltaX y:(CGFloat)deltaY duration:(NSTimeInterval)sec {
     
-    NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
-    
-    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
-
-        if (action.reset) {
-            action.startPos = action.node->getPosition();
-            ofPoint p = action.node->getPosition();
-            action.endPos = ofPoint(p.x + deltaX, p.y+deltaY, p.z);
-            action.reset = false;
-        }
-        
-        
-        
-        action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
-        
-    };
-    
-    return action;
+    return [NodeAction move3dByX:deltaX Y:deltaY Z:0 duration:sec];
     
 }
 
@@ -165,6 +148,35 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     return [NodeAction moveByX:delta.dx y:delta.dy duration:sec];
     
 }
+
++ (NodeAction *)move3dBy:(ofVec3f)delta duration:(NSTimeInterval)sec {
+    
+    return [NodeAction move3dByX:delta.x Y:delta.y Z:delta.z duration:sec];
+    
+}
+
++ (NodeAction *)move3dByX:(CGFloat)x Y:(CGFloat)y Z:(CGFloat)z duration:(NSTimeInterval)sec {
+    
+    NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
+    
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
+        
+        if (action.reset) {
+            action.startPos = action.node->getPosition();
+            ofPoint p = action.node->getPosition();
+            action.endPos = ofPoint(p.x + x, p.y+y, p.z + z);
+            action.reset = false;
+        }
+
+        action.node->setPosition(getTweenPoint(action.startPos, action.endPos, completion));
+        
+    };
+    
+    return action;
+    
+}
+
+#pragma mark - MOVE TO
 
 + (NodeAction *)moveToX:(CGFloat)x y:(CGFloat)y duration:(NSTimeInterval)sec {
     
@@ -237,7 +249,7 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
 
 #pragma mark - ROTATE
 
-+(NodeAction *)rotateByAngle:(CGFloat)radians duration:(NSTimeInterval)sec {
++(NodeAction *)rotate3dByAngle:(ofVec3f)angles duration:(NSTimeInterval)sec {
     
     NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
     
@@ -247,14 +259,60 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
             action.reset = false;
             ofQuaternion start = action.node->getOrientationQuat();
             action.startOrientation = start;
-            ofQuaternion zRot = ofQuaternion(radians, ofVec3f(0,0,1));
-            action.endOrientation = start*zRot;
+            ofQuaternion xRot = ofQuaternion(angles.x, ofVec3f(1,0,0));
+            ofQuaternion yRot = ofQuaternion(angles.y, ofVec3f(0,1,0));
+            ofQuaternion zRot = ofQuaternion(angles.z, ofVec3f(0,0,1));
+            action.endOrientation = start*xRot*yRot*zRot;
         }
         
         ofQuaternion x;
         x.slerp(completion, action.startOrientation, action.endOrientation);
         action.node->setOrientation(x);
+        
+        
+    };
+    
+    return action;
+    
+}
 
++(NodeAction *)rotateXByAngle:(CGFloat)radians duration:(NSTimeInterval)sec {
+    
+    return [NodeAction rotateAxis:ofVec3f(1,0,0) byAngle:radians duration:sec];
+    
+}
+
++(NodeAction *)rotateYByAngle:(CGFloat)radians duration:(NSTimeInterval)sec {
+    
+    return [NodeAction rotateAxis:ofVec3f(0,1,0) byAngle:radians duration:sec];
+    
+}
+
+
++(NodeAction *)rotateByAngle:(CGFloat)radians duration:(NSTimeInterval)sec {
+    
+    return [NodeAction rotateAxis:ofVec3f(0,0,1) byAngle:radians duration:sec];
+    
+}
+
++(NodeAction *)rotateAxis:(ofVec3f)axis byAngle:(CGFloat)radians duration:(NSTimeInterval)sec {
+    
+    NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
+    
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
+        
+        if (action.reset) {
+            action.reset = false;
+            ofQuaternion start = action.node->getOrientationQuat();
+            action.startOrientation = start;
+            ofQuaternion rot = ofQuaternion(radians, axis);
+            action.endOrientation = start*rot;
+        }
+        
+        ofQuaternion x;
+        x.slerp(completion, action.startOrientation, action.endOrientation);
+        action.node->setOrientation(x);
+        
         
     };
     

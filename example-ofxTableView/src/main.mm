@@ -7,7 +7,7 @@ int main(){
 
     ofxiOSGetOFWindow()->enableRetina();
     ofxiOSGetOFWindow()->enableDepthBuffer();
-    
+    ofxiOSGetOFWindow()->enableAntiAliasing(2);
 	//ofRunApp(new testApp());
     ofRunApp(new nodeTest());
 }

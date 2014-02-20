@@ -14,24 +14,24 @@
 
 // INIT
 
-+ (instancetype)spriteNodeWithTexture:(ofTexture)texture size:(CGSize)size;
-+ (instancetype)spriteNodeWithTexture:(ofTexture)texture;
++ (instancetype)spriteNodeWithTexture:(ofTexture*)texture size:(CGSize)size;
++ (instancetype)spriteNodeWithTexture:(ofTexture*)texture;
 + (instancetype)spriteNodeWithImageNamed:(NSString *)name;
-+ (instancetype)spriteNodeWithColor:(ofColor)color size:(CGSize)size;
++ (instancetype)spriteNodeWithColor:(UIColor *)color size:(CGSize)size;
 
-- (instancetype)initWithTexture:(ofTexture)texture color:(ofColor)color size:(CGSize)size;
-- (instancetype)initWithTexture:(ofTexture)texture;
+- (instancetype)initWithTexture:(ofTexture*)texture color:(UIColor *)color size:(CGSize)size;
+- (instancetype)initWithTexture:(ofTexture*)texture;
 - (instancetype)initWithImageNamed:(NSString *)name;
-- (instancetype)initWithColor:(ofColor)color size:(CGSize)size;
+- (instancetype)initWithColor:(UIColor *)color size:(CGSize)size;
 
 // ACTIONS
 
 
 
-@property (nonatomic) ofTexture texture;
+@property (nonatomic) ofTexture *texture;
 @property (nonatomic) ofRectangle centerRect;
 @property (nonatomic) float colorBlendFactor;
-@property (nonatomic) ofColor color;
-@property (nonatomic) ofPoint anchorPoint;
+@property (nonatomic) UIColor* color;
+
 
 @end

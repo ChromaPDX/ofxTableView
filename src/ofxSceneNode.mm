@@ -17,8 +17,7 @@
     if (self){
         
         self.size = size;
-        self.anchorPoint = CGPointMake(.5, .5);
-        self.backgroundColor = [UIColor colorWithRed:.25 green:.25 blue:.25 alpha:0];
+        self.backgroundColor = [UIColor colorWithRed:.25 green:.25 blue:.25 alpha:1.];
         self.shouldRasterize = false;
         
         _camera = [[ofxCameraNode alloc] init];
@@ -43,12 +42,16 @@
 }
 -(void) begin {
 
+    
     if (!self.parent) {
         
         // I AM ROOT DO SOME CONFIG
         ofEnableDepthTest();
-        ofEnableAlphaBlending();
+        //ofEnableAlphaBlending();
+       // ofEnableBlendMode(OF_BLENDMODE_ADD);
+        
         ofClear(ofColorWithUIColor(_backgroundColor));
+        
         ((ofCamera*)_camera.node)->begin();
     
     }
@@ -70,20 +73,15 @@
         
         else {
             ofPushMatrix();
-            ofMultMatrix(self.node->getLocalTransformMatrix());
+            ofMultMatrix(self.node->getGlobalTransformMatrix());
+         //   self.node->transformGL();
             
         }
         
-        if (self.blendMode) {
-            ofEnableBlendMode(self.blendMode);
-        }
-        if (_backgroundColor) {
-            ofFill();
+//        if (self.blendMode) {
+//            ofEnableBlendMode(self.blendMode);
+//        }
 
-            ofSetColor(ofColorWithUIColor(_backgroundColor));
-                
-            ofRect(d);
-        }
 
     }
     
@@ -91,11 +89,11 @@
 
 -(void)draw {
     
+   
+    
     [self begin];
     
     if  (debugUI){
-        ofSetColor(255,0,0,255);
-        ofDrawSphere(self.node->getPosition(), 10);
         
         ofRectangle d = [self getDrawFrame];
         
@@ -107,13 +105,24 @@
         
         ofRect(d);
     }
-
-    for (ofxNode *child in children) {
+    
+    if (_borderColor) {
         
+        ofRectangle d = [self getDrawFrame];
+        
+        ofNoFill();
+        
+        ofSetColor(ofColorWithUIColor(_borderColor));
+        
+        ofSetLineWidth(2);
+        
+        ofRect(d);
+    }
+    
+    for (ofxNode *child in children) {
         if (!child.isHidden) {
             [child draw];
         }
-        
     }
     
     [self end];
@@ -126,32 +135,12 @@
     
     if (!self.isHidden && (!_shouldRasterize || (_shouldRasterize && dirty)))
     {
-
-        if (_borderColor) {
-            
-            ofRectangle d = [self getDrawFrame];
-            
-            ofNoFill();
-            
-            ofSetColor(ofColorWithUIColor(_borderColor));
-            
-            ofSetLineWidth(2);
-            
-            ofRect(d);
-        }
-        
-        if  (debugUI){
-            
-            ofDisableDepthTest();
-            string stats = "nodes :" + ofToString(children.count) + " fps: " + ofToString(fps);
-            
-            ofRectangle d = [self getDrawFrame];
-            ofDrawBitmapStringHighlight(stats, (d.x + d.width) - 135, (d.y + d.height) - 7);
-            ofDisableDepthTest();
-        }
-        
         
         if (_shouldRasterize) {
+            
+            if (!self.parent) {
+                ((ofCamera*)_camera.node)->end();
+            }
             
             fbo->end();
             dirty = false;
@@ -159,8 +148,13 @@
         }
         
         else {
-            ((ofCamera*)_camera.node)->end();
-              ofPopMatrix();
+            ofPopMatrix();
+            //self.node->restoreTransformGL();
+            
+            if (!self.parent) {
+                ((ofCamera*)_camera.node)->end();
+            }
+         
         }
         
     }
@@ -177,23 +171,25 @@
         ofPopMatrix();
     }
     
-    
-}
-
--(void)dealloc {
-    if (fbo) {
-        delete fbo;
+    if  (debugUI){
+        string stats = "nodes :" + ofToString([self numNodes]) + " draws: " + ofToString([self numVisibleNodes]) + " fps: " + ofToString(fps);
+        ofDrawBitmapStringHighlight(stats, ofPoint(ofGetWidth() - 230, ofGetHeight()- 7, _camera.get3dPosition.z));
     }
+    
+    
 }
 
 
 -(bool)touchDown:(CGPoint)location id:(int)touchId {
     // OVERRIDE
+    
+    CGPoint p = [_camera screenToWorld:location];
+    
     for (ofxNode *child in children) {
         
-        if ([child containsPoint:location])
+        if ([child containsPoint:p])
         {
-            [child touchDown:location id:touchId ];
+            [child touchDown:p id:touchId ];
         }
         
     }
@@ -205,11 +201,13 @@
     
     bool hit = false;
     
+    CGPoint p = [_camera screenToWorld:location];
+    
     for (ofxNode *child in children) {
         
-        if ([child containsPoint:location])
+        if ([child containsPoint:p])
         {
-            [child touchUp:location id:touchId ];
+            [child touchUp:p id:touchId ];
             hit = true;
         }
 
@@ -223,11 +221,13 @@
 
 -(bool)touchMoved:(CGPoint)location id:(int)touchId {
     // OVERRIDE
+    CGPoint p = [_camera screenToWorld:location];
+    
     for (ofxNode *child in children) {
         
-        if ([child containsPoint:location])
+        if ([child containsPoint:p])
         {
-            [child touchMoved:location id:touchId ];
+            [child touchMoved:p id:touchId ];
         }
         
     }
@@ -252,10 +252,16 @@
         ((ofCamera*)self.node)->setNearClip(.1);
         ((ofCamera*)self.node)->setFarClip(2000);
         
-        ((ofCamera*)self.node)->setPosition(0, 0., 1000);
-        
+        ((ofCamera*)self.node)->setPosition(0., 0., 1000);
+        //((ofCamera*)self.node)->setAspectRatio(9./16.);
     }
     return self;
+}
+
+-(CGPoint)screenToWorld:(CGPoint)p {
+    ofVec3f p2 = ((ofCamera*)self.node)->screenToWorld(ofVec3f(p.x, p.y, 0));
+    //NSLog(@"screen i: %f %f o:%f %f", p.x, p.y, p2.x * 5000, p2.y * 5000);
+    return CGPointMake(p2.x * 5000, p2.y * 5000);
 }
 
 @end

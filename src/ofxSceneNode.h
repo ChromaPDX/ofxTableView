@@ -24,9 +24,16 @@
 
 -(instancetype) initWithSize:(CGSize)size;
 
+- (void)draw;
+// encompasses 3 states
+-(void)begin;
+-(void)customDraw;
+-(void)end;
 
 @end
 
 @interface ofxCameraNode : ofxNode
+
+-(CGPoint)screenToWorld:(CGPoint)p;
 
 @end

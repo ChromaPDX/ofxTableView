@@ -37,10 +37,19 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 @property (nonatomic) ofNode *node;
 
 
+@property (nonatomic) bool userInteractionEnabled;
+
 - (instancetype) init;
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt;
-- (void)draw;
 
+- (void)draw;
+// encompasses 3 states
+-(void)begin;
+-(void)customDraw;
+-(void)end;
+
+-(int)numVisibleNodes;
+-(int)numNodes;
 
 @property (nonatomic) ofBlendMode blendMode;
 // WISH LIST TO FOLLOW
@@ -85,7 +94,7 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 ///**
 // The scene that the node is currently in.
 // */
-@property (nonatomic, readonly) ofxSceneNode* scene;
+@property (nonatomic, weak) ofxSceneNode* scene;
 //
 //@property (nonatomic, retain) SKPhysicsBody *physicsBody;
 //
@@ -161,7 +170,7 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 -(bool)containsPoint:(CGPoint) location;
 
 @property (nonatomic) CGSize size;
-@property (nonatomic) CGPoint anchorPoint;
+@property (nonatomic) ofPoint anchorPoint;
 
 -(ofRectangle)getDrawFrame;
 

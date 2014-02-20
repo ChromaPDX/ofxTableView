@@ -10,8 +10,307 @@
 
 @implementation ofxScrollNode
 
--(void)updateWithTimeSinceLast:(NSTimeInterval)dt {
 
+#pragma ADD Cells
+
+
+
+
+-(instancetype) initWithColor:(UIColor *)color size:(CGSize)size {
+    
+
+    self = [super initWithColor:color size:size];
+    
+    if (self) {
+
+        _sharedFont = new ofTrueTypeFont;
+        
+        if (!_sharedFont->loadFont(DEFAULT_FONT_STRING, DEFAULT_FONT_SIZE * getScreenScale())){
+            
+        }
+        
+        _scrollDirectionVertical = true;
+        scrollingEnabled = true;
+        verticalPadding = 10;
+        _fdirty = true;
+        
+        self.userInteractionEnabled = true;
+        //float nbgColor[4] = {rand()%255/255., rand()%255/255.,rand()%255/255.,1.};
+        
+//        setBgColor(nbgColor);
+//        
+//        _xRootOffset = getX();
+//        _yRootOffset = getY();
+//        
+//        xTouchOffset = &_xRootOffset;
+//        yTouchOffset = &_yRootOffset;
+        
+        restitution = 3;
+        drag = 1.5;
+        
+    }
+    
+    return self;
+}
+
+-(instancetype) initWithParent:(ofxScrollNode *)parent autoSizePct:(float)autoSizePct {
+    
+    if (!parent){
+        return nil;
+    }
+    
+    CGSize size;
+    if (parent.scrollDirectionVertical) {
+        size = CGSizeMake(parent.size.width, parent.size.height*autoSizePct);
+    }
+    else {
+        size = CGSizeMake(parent.size.width*autoSizePct,parent.size.height);
+    }
+    
+    self = [super initWithColor:parent.color size:size];
+    
+    if (self) {
+
+       
+        _autoSizePct = autoSizePct;
+        
+        horizontalPadding = 20;
+        verticalPadding = 20;
+        
+        
+        self.color = [UIColor redColor];
+        
+        parent->cdirty = true;
+        parent.fdirty = true;
+        
+        restitution = 3;
+        drag = 1.5;
+        
+        [parent addChild:self];
+        
+        self.userInteractionEnabled = true;
+    }
+
+    return self;
+
+}
+
+#pragma DRAW etc.
+
+
+-(void)setHighlighted:(bool)highlighted {
+    
+_highlighted = highlighted;
+    
+//    bool shouldHighlight = true;
+//    
+//    if (children){
+//        if (!_highlighted) {
+//            for (ofxNode *child in children) {
+//                if ([child isKindOfClass:ofxScrollNode.class]){
+//                    shouldHighlight = false;
+//                    [(ofxScrollNode*)child setHighlighted:false];
+//                }
+//            }
+// 
+//        }
+//    }
+//    
+//    if (shouldHighlight) {
+//        NSLog(@"higlighting %d", highlighted);
+//        _highlighted = highlighted;
+//    }
+    
+    // }
+    
+}
+
+#pragma mark - Scroll
+
+-(float)contentSize {
+    if (cdirty) {
+        
+        int tempSize = 0;
+        
+        for(int i = 0; i < children.count; i++)
+        {
+            ofxScrollNode *child = children[i];
+            
+            if (_scrollDirectionVertical) {
+                int temp = child.size.height;
+                
+                tempSize += temp + verticalPadding;
+            }
+            else {
+                int temp = child.size.width;
+                tempSize += temp + horizontalPadding;
+            }
+            
+        }
+        
+        contentSize = tempSize;
+        
+        return tempSize;
+        
+    }
+    
+    else {
+        return contentSize;
+    }
+}
+
+-(float)outOfBounds {
+
+    if (_scrollDirectionVertical) {
+        
+        if (_scrollPosition > verticalPadding) {
+            return _scrollPosition - verticalPadding;
+        }
+        
+        else {
+            
+            if (self.contentSize > self.size.height) {
+                
+                int diff = _scrollPosition + self.contentSize - self.size.height;
+                if (diff < 0){
+                    
+                    return diff;
+                    
+                }
+                
+            }
+            else {
+                if (_scrollPosition < verticalPadding) {
+                    return _scrollPosition - verticalPadding;
+                }
+            }
+            
+        }
+        
+    }
+    
+    else {
+        
+        if (_scrollPosition > horizontalPadding) {
+            return _scrollPosition - horizontalPadding;
+        }
+        
+        else {
+            
+            if (self.contentSize > self.size.width) {
+                
+                int diff = _scrollPosition + self.contentSize - self.size.width;
+                
+                if (diff < 0){
+                    
+                    return diff;
+                    
+                }
+                
+            }
+            else {
+                if (_scrollPosition < horizontalPadding) {
+                    return _scrollPosition - horizontalPadding;
+                }
+            }
+            
+        }
+        
+        
+    }
+    
+    return 0;
+    
+}
+
+-(void) setChildFrame:(ofxScrollNode *)child{
+    
+    if (_fdirty) {
+        
+        if (_scrollDirectionVertical){
+            
+            int tempSize = 0;
+            for(int i = 0; i < [children indexOfObject:child]; i++)
+            {
+                int temp = child.size.height;
+                tempSize += temp + verticalPadding;
+            }
+            
+            float childSize = self.size.height * child.autoSizePct;
+            
+            [child set3dPosition:ofPoint((horizontalPadding / 2.),
+                                        tempSize + _scrollPosition + childSize/2. - self.size.height/2.,
+                                         1)];
+            [child setSize:CGSizeMake(self.size.width-(horizontalPadding),
+             childSize)];
+            
+        }
+        
+        else {
+            
+            int tempSize = 0;
+            
+            for(int i = 0; i < [children indexOfObject:child]; i++)
+            {
+                int temp = child.size.width;
+                tempSize += temp + horizontalPadding;
+            }
+            
+            float childSize = self.size.width * child.autoSizePct;
+            
+            
+            [child set3dPosition:ofPoint(tempSize + _scrollPosition + childSize/2. - self.size.width/2.,
+                                         (verticalPadding/2.),
+                                         1)];
+            
+            [child setSize:CGSizeMake(
+                                      childSize, self.size.height-(verticalPadding))];
+        }
+        
+        child.hidden = [child scrollShouldCull];
+        
+        
+        
+    }
+    
+}
+
+-(bool)scrollShouldCull {
+ 
+     return false;
+    
+            ofRectangle d = [self.parent getDrawFrame];
+            
+            if ([(ofxScrollNode*)self.parent scrollDirectionVertical] && (self.node->getY() + self.size.height/2. < d.y ||
+                                                                  self.node->getY() - self.node->getY()/2. > d.y + self.parent.size.height)) {
+                return true;
+            }
+            
+            else if (self.node->getX() + self.size.width/2. < d.x || self.node->getX() - self.size.width/2. > d.x + d.width) {
+                return true;
+            }
+
+   
+    
+}
+
+-(void)setScrollPosition:(float)scrollPosition {
+    [self setScrollPostion:scrollPosition animated:false];
+}
+
+-(void)setScrollPostion:(int)offset animated:(bool)animated {
+    
+    if (_scrollPosition != offset) {
+        _scrollPosition = offset;
+        _fdirty = true;
+    }
+    
+}
+
+#pragma mark - update / draw
+
+-(void)updateWithTimeSinceLast:(NSTimeInterval)dt {
+    
     [super updateWithTimeSinceLast:dt];
     
     if  (scrollingEnabled){
@@ -82,157 +381,37 @@
         
     }
     
- for (ofxNode *child in children) {
-     [child updateWithTimeSinceLast:dt];
-    }
-    
-    
-    
-}
-
-#pragma DRAW etc.
-
-
--(void)setHighlighted:(bool)highlighted {
-    
-    //if (highlighted != setHighlighted) {
-    
-    if (children){
-        if (!_highlighted) {
-            for (ofxNode *child in children) {
-                if ([child isKindOfClass:ofxScrollNode.class]){
-                    [(ofxScrollNode*)child setHighlighted:false];
-                }
+    if (scrollingEnabled){
+        if (_fdirty || cdirty) {
+            for (ofxScrollNode *child in children) {
+                [self setChildFrame:child];
+                child.fdirty = true;
             }
- 
+            
+            _fdirty = false;
+            cdirty = false;
         }
     }
     
-    else {
-        _highlighted = highlighted;
-    }
-    
-    // }
-    
 }
 
-#pragma mark - Scroll
-
--(float)contentSize {
-    if (cdirty) {
+-(void)customDraw {
+   
+    
+    if (_highlighted) {
+            ofRectangle rect = [self getDrawFrame];
         
-        int tempSize = 0;
-        
-        for(int i = 0; i < children.count; i++)
-        {
-            ofxScrollNode *child = children[i];
-            
-            if (scrollDirectionVertical) {
-                int temp = child.size.height;
-                
-                tempSize += temp + verticalPadding;
-            }
-            else {
-                int temp = child.size.width;
-                tempSize += temp + horizontalPadding;
-            }
-            
-        }
-        
-        contentSize = tempSize;
-        
-        return tempSize;
+            ofSetColor(255,255,255,100);
+            ofFill();
+            ofRect(rect);
+            //ofRect(0, 0, 400, 400);
+       // NSLog(@"draw highlight");
         
     }
     
-    else {
-        return contentSize;
-    }
-}
-
--(float)outOfBounds {
-
-    if (scrollDirectionVertical) {
-        
-        if (_scrollPosition > verticalPadding) {
-            return _scrollPosition - verticalPadding;
-        }
-        
-        else {
-            
-            if (self.contentSize > self.size.height) {
-                
-                int diff = _scrollPosition + self.contentSize - self.size.height;
-                if (diff < 0){
-                    
-                    return diff;
-                    
-                }
-                
-            }
-            else {
-                if (_scrollPosition < verticalPadding) {
-                    return _scrollPosition - verticalPadding;
-                }
-            }
-            
-        }
-        
-    }
-    
-    else {
-        
-        if (_scrollPosition > horizontalPadding) {
-            return _scrollPosition - horizontalPadding;
-        }
-        
-        else {
-            
-            if (self.contentSize > self.size.width) {
-                
-                int diff = _scrollPosition + self.contentSize - self.size.width;
-                
-                if (diff < 0){
-                    
-                    return diff;
-                    
-                }
-                
-            }
-            else {
-                if (_scrollPosition < horizontalPadding) {
-                    return _scrollPosition - horizontalPadding;
-                }
-            }
-            
-        }
-        
-        
-    }
-    
-    return 0;
+     [super customDraw];
     
 }
-
--(void)setScrollPosition:(float)scrollPosition {
-    [self setScrollPostion:scrollPosition animated:false];
-}
-
--(void)setScrollPostion:(int)offset animated:(bool)animated {
-    
-    if (_scrollPosition != offset) {
-        _scrollPosition = offset;
-        fdirty = true;
-    }
-    
-}
-
-#pragma mark - draw 
-
--(void)draw {
-    
-}
-
 #pragma mark - Touch Handling
 
 // TOUCH HANDLING
@@ -306,7 +485,7 @@
         int sDt;
         int cDt;
         
-        if (scrollDirectionVertical) {
+        if (_scrollDirectionVertical) {
             sDt = (location.y - yOrigin);
             cDt = (location.x - xOrigin);
         }
@@ -325,12 +504,12 @@
             
             if (fabs(scrollVel) > fabs(counterVel) + (restitution * 2.)){
                 _scrollPhase = ScrollPhaseRecognized;
-                //NSLog(@"Scroll started %f, %f", scrollVel, counterVel);
+                NSLog(@"Scroll started %f, %f", scrollVel, counterVel);
                 
             }
             
             else if (fabs(counterVel) > fabs(scrollVel) + (restitution)){
-                // NSLog(@"FAILED %f, %f", counterVel, scrollVel);
+                 NSLog(@"FAILED %f, %f", counterVel, scrollVel);
                 _scrollPhase = ScrollPhaseBeginFail;
             }
             
@@ -394,7 +573,6 @@
 
 -(bool)touchUp:(CGPoint)location id:(int)touchId    {
     
-    NSLog(@"touch up scroll");
     bool hit = true;
     
 //    if (_modalChild){
@@ -403,7 +581,7 @@
 //    }
     
     for (ofxNode *child in children) {
-        if  (!child.isHidden){
+        if  (child.userInteractionEnabled && !child.isHidden){
             if (![child containsPoint:location])
             {
                 if ([child isKindOfClass:ofxScrollNode.class]){
@@ -418,16 +596,20 @@
         if (_scrollPhase == ScrollPhaseFailed || _scrollPhase == ScrollPhaseBegan || _scrollPhase == ScrollPhaseNil) {
             
             for (ofxNode *child in children) {
-
+                
+                if (child.userInteractionEnabled){
+                    
+                    
                     if ([child containsPoint:location])
                     {
                         [child touchUp:location id:touchId ];
                         hit = false;
                     }
-                
+                    
                     else if ([child isKindOfClass:ofxScrollNode.class]){
                         if ([(ofxScrollNode*)child scrollPhase] != ScrollPhaseNil) [child touchUp:location id:touchId ];
                     }
+                }
                 
                 
             }
@@ -437,9 +619,8 @@
         }
         
         else {
-
-            // NSLog(@"scroll ended on %s %f", displayName.c_str(), scrollVel);
             
+            hit = false;
             _scrollPhase = ScrollPhaseEnded;
         }
         
@@ -449,7 +630,9 @@
         
         
         for (ofxNode *child in children) {
-
+            
+            if  (child.userInteractionEnabled && !child.isHidden){
+                
                 if ([child containsPoint:location])
                 {
                     [child touchUp:location id:touchId ];
@@ -461,6 +644,7 @@
                         [(ofxScrollNode*)child setHighlighted:false];
                     }
                 }
+            }
             
         }
         
@@ -468,6 +652,7 @@
     }
     
     if (hit) {
+        NSLog(@"highlight yes!");
         [self setHighlighted:true];
     }
     

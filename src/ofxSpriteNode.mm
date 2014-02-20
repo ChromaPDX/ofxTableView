@@ -10,12 +10,12 @@
 
 @implementation ofxSpriteNode
 
-+ (instancetype)spriteNodeWithTexture:(ofTexture)texture size:(CGSize)size {
-    ofxSpriteNode *node = [[ofxSpriteNode alloc] initWithTexture:texture color:ofColor(255) size:size];
++ (instancetype)spriteNodeWithTexture:(ofTexture*)texture size:(CGSize)size {
+    ofxSpriteNode *node = [[ofxSpriteNode alloc] initWithTexture:texture color:[UIColor colorWithWhite:1. alpha:1.] size:size];
     return node;
 }
 
-+ (instancetype)spriteNodeWithTexture:(ofTexture)texture {
++ (instancetype)spriteNodeWithTexture:(ofTexture*)texture {
     ofxSpriteNode *node = [[ofxSpriteNode alloc] initWithTexture:texture];
     return node;
 }
@@ -25,12 +25,13 @@
     return node;
 }
 
-+ (instancetype)spriteNodeWithColor:(ofColor)color size:(CGSize)size {
++ (instancetype)spriteNodeWithColor:(UIColor*)color size:(CGSize)size {
     ofxSpriteNode *node = [[ofxSpriteNode alloc] initWithColor:color size:size];
     return node;
 }
 
-- (instancetype)initWithTexture:(ofTexture)texture color:(ofColor)color size:(CGSize)size {
+- (instancetype)initWithTexture:(ofTexture*)texture color:(UIColor*)color size:(CGSize)size {
+    
     self = [super init];
     
     if (self) {
@@ -41,30 +42,41 @@
     return self;
 }
 
-- (instancetype)initWithTexture:(ofTexture)texture {
-    return [self initWithTexture:texture color:ofColor(255) size:CGSizeMake(texture.getWidth(),texture.getHeight())];
+- (instancetype)initWithTexture:(ofTexture*)texture {
+    return [self initWithTexture:texture color:[UIColor colorWithWhite:1. alpha:1.] size:CGSizeMake(texture->getWidth(),texture->getHeight())];
 }
 
 - (instancetype)initWithImageNamed:(NSString *)name {
     ofImage image;
     image.loadImage(string(name.cString));
 
-    self = [self initWithTexture:image.getTextureReference() color:ofColor(255) size:CGSizeMake(image.getWidth(),image.getHeight())];
-    return self;
+    return [self initWithTexture:&image.getTextureReference() color:[UIColor colorWithWhite:1. alpha:1.] size:CGSizeMake(image.getWidth(),image.getHeight())];
 }
 
-- (instancetype)initWithColor:(ofColor)color size:(CGSize)size {
-    return [self initWithTexture:ofTexture() color:color size:CGSizeMake(_texture.getWidth(),_texture.getHeight())];
+- (instancetype)initWithColor:(UIColor*)color size:(CGSize)size {
+    return [self initWithTexture:nil color:color size:size];
 }
 
 // DRAW
 
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt {
+    [super updateWithTimeSinceLast:dt];
+}
+
+-(void)customDraw {
+
+    ofRectangle rect = [self getDrawFrame];
+    
+    if (_color) {
+        ofSetColor(ofColorWithUIColor(_color));
+        ofFill();
+        ofRect(rect);
+    }
     
 }
 
--(void)draw {
-
+-(void)dealloc {
+    delete _texture;
 }
 
 @end

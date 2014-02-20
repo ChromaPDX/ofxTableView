@@ -18,11 +18,13 @@
     if (self){
         node = new ofNode;
         
-        _anchorPoint = CGPointMake(.5, .5);
+        _anchorPoint = ofPoint(.5, .5, 0);
         _hidden = false;
         _size = CGSizeMake(2, 2);
         
         animationHandler = [[NodeAnimationHandler alloc]initWithNode:node];
+        
+        _userInteractionEnabled = false;
     }
     return self;
 }
@@ -30,11 +32,57 @@
 #pragma mark - Node Hierarchy
 
 - (void)addChild:(ofxNode *)child {
+    
     if (!children) {
         children = [[NSMutableArray alloc]init];
     }
 
     [children addObject:child];
+    [child setParent:self];
+    [child set3dPosition:ofPoint(0,0,3)];
+    
+}
+
+-(int)numNodes {
+    
+    int count = 0;
+    
+    for (ofxNode* child in children) {
+        count += [child numNodes];
+        count++;
+    }
+    
+    return count;
+    
+}
+
+-(int)numVisibleNodes {
+    
+    int count = 0;
+    
+    for (ofxNode* child in children) {
+        if (!child.isHidden) {
+            count += [child numVisibleNodes];
+            count++;
+        }
+    }
+    
+    return count;
+    
+}
+
+-(void)setParent:(ofxNode *)parent {
+    
+    if (!parent.parent){
+        _scene = (ofxSceneNode*)parent;
+    }
+    else {
+        _scene = parent.scene;
+    }
+    
+    _parent = parent;
+    
+    node->setParent(*parent.node);
 }
 
 - (void)insertChild:(ofxNode *)child atIndex:(NSInteger)index{
@@ -45,7 +93,9 @@
 }
 
 - (void)removeChildrenInArray:(NSArray *)nodes{
-    [children removeObjectsInArray:nodes];
+    NSMutableArray *childMut = [children mutableCopy];
+    [childMut removeObjectsInArray:nodes];
+    children = childMut;
 }
 
 - (void)removeAllChildren{
@@ -68,42 +118,63 @@
 #pragma mark - UPDATE / DRAW
 
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt {
-    // OVERRIDE, CALL SUPER
+    // IF OVERRIDE, CALL SUPER
+    
     [animationHandler updateWithTimeSinceLast:dt];
+    
+    for (ofxNode *child in children) {
+        [child updateWithTimeSinceLast:dt];
+    }
 }
 
 
-
--(void)draw {
-    
-    // OVERRIDE THIS
-    ofSetColor(100, 100, 100,100);
-    ofRect([self getDrawFrame]);
-    
-    ofSetColor(255,0,0,255);
-    ofDrawSphere(node->getPosition(), 10);
-    
+-(void)begin {
+   ofPushMatrix();
+    ofMultMatrix(self.node->getLocalTransformMatrix());
+   
     for (ofxNode *child in children) {
-        
         if (!child.isHidden) {
             [child draw];
         }
-        
-        
     }
+}
+
+-(void)draw {
+    [self begin];
+
+    [self customDraw];
+
+    [self end];
+}
+
+-(void)customDraw {
+    if (debugUI) {
+        ofSetColor(255,0,0,255);
+        ofDrawSphere(node->getPosition(), 10);
+    }
+}
+
+-(void)end {
     
+
+    
+    ofPopMatrix();
 }
 
 #pragma mark - GEOMETRY
 
 -(bool)containsPoint:(CGPoint)location {
     
+    CGPoint p = location;
+    
+    //NSLog(@"world coords: %f %f %f", p.x, p.y, p.z);
+    
     ofRectangle d = [self getWorldFrame];
     
     //bool withinArea = false;
-    if ( location.x > d.x && location.x < d.x + d.width && location.y > d.y && location.y < d.y + d.height)
+    if ( p.x > d.x && p.x < d.x + d.width && p.y > d.y && p.y < d.y + d.height)
     {
-        [self logCoords];
+       // [self logCoords];
         return true;
     }
     return false;
@@ -111,11 +182,16 @@
 }
 
 -(ofRectangle)getWorldFrame{
-    
     ofPoint g = node->getGlobalPosition();
-    
-    return ofRectangle(g.x - _size.width * _anchorPoint.x, g.y-_size.height *_anchorPoint.y, _size.width, _size.height);
-    
+    return ofRectangle(g.x - _size.width * _anchorPoint.x, g.y - _size.height *_anchorPoint.y, _size.width, _size.height);
+}
+
+
+-(ofRectangle)getDrawFrame {
+    //[self logCoords];
+    //ofPoint g = node->getPosition();
+    //return ofRectangle(g.x - _size.width * _anchorPoint.x, g.y - _size.height *_anchorPoint.y, _size.width, _size.height);
+    return ofRectangle(-_size.width * _anchorPoint.x, -_size.height *_anchorPoint.y, _size.width, _size.height);
 }
 
 -(void)logCoords{
@@ -123,11 +199,6 @@
     NSLog(@"node pos %f, %f, %f :: size %f %f", p.x, p.y, p.z, _size.width, _size.height);
 }
 
--(ofRectangle)getDrawFrame {
-    //[self logCoords];
-    ofPoint g = node->getPosition();
-    return ofRectangle(g.x - _size.width * _anchorPoint.x, g.y - _size.height *_anchorPoint.y, _size.width, _size.height);
-}
 
 -(void)setPosition:(CGPoint)position {
     [self set3dPosition:ofPoint(position.x, position.y, node->getZ())];

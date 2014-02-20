@@ -5,6 +5,7 @@
 #include "ofxiOSExtras.h"
 #include "ofxTableView.h"
 
+
 class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     public:
@@ -41,6 +42,7 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
     
     void cellWasSelected(ofxTableViewCell *cell);
     
+
 };
 
 
