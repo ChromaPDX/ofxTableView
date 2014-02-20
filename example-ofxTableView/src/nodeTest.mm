@@ -13,21 +13,27 @@ void nodeTest::setup(){
     
     [scene setPosition:CGPointMake(0, 0)];
     
+    pivot = [[ofxNode alloc]init];
     
-    ofxScrollNode *table = [[ofxScrollNode alloc] initWithColor:nil size:scene.size];
+    [scene addChild:pivot];
     
+    [pivot runAction:[NodeAction repeatActionForever:[NodeAction rotate3dByAngle:ofVec3f(0,0,90) duration:1.]]];
+    
+  
+    ofxScrollNode *table = [[ofxScrollNode alloc] initWithColor:[UIColor colorWithRed:.1 green:.1 blue:.1 alpha:.3] size:scene.size];
+//    
     [scene addChild:table];
 
-    for (int i = 0; i < 4; i++){
-        ofxScrollNode *cell = [[ofxScrollNode alloc] initWithParent:table autoSizePct:.25];
-        cell.color = [UIColor colorWithRed:0. green:0.8 blue:0.8 alpha:.1];
-        
-        ofxNode *pivot = [[ofxNode alloc]init];
-        
-        [cell addChild:pivot];
-        
-        [pivot runAction:[NodeAction repeatActionForever:[NodeAction rotate3dByAngle:ofVec3f(0,90,0) duration:1.]]];
-        
+//    for (int i = 0; i < 4; i++){
+//        ofxScrollNode *cell = [[ofxScrollNode alloc] initWithParent:table autoSizePct:.25];
+//        cell.color = [UIColor colorWithRed:0. green:0.8 blue:0.8 alpha:.1];
+//        
+//        ofxNode *pivot = [[ofxNode alloc]init];
+//        
+//        [cell addChild:pivot];
+//        
+//        [pivot runAction:[NodeAction repeatActionForever:[NodeAction rotate3dByAngle:ofVec3f(0,90,0) duration:1.]]];
+    
 //        ofxSpriteNode *label = [[ofxSpriteNode alloc]initWithColor:[UIColor colorWithRed:1. green:1. blue:1. alpha:.8] size:CGSizeMake(cell.size.width, cell.size.height/2.)];
 //        [pivot addChild:label];
 //        ofxSpriteNode *label2 = [[ofxSpriteNode alloc]initWithColor:[UIColor colorWithRed:1. green:1. blue:1. alpha:.8] size:CGSizeMake(cell.size.width, cell.size.height/2.)];
@@ -48,7 +54,7 @@ void nodeTest::setup(){
 //                                                                                 [NodeAction moveByX:cell.size.width*.5 y:0 duration:.5]
 //                                                                                 ]]]];
         
-    }
+//    }
     
     setupCM();
    
@@ -108,15 +114,18 @@ void nodeTest::setupCM(){
 }
 //--------------------------------------------------------------
 void nodeTest::update(){
-    ofxPrimitiveNode *sphere = [[ofxPrimitiveNode alloc]initWith3dPrimitive:new ofSpherePrimitive(100,10) fillColor:nil];
     
-    sphere.wireFrameColor = [UIColor colorWithRed:1. green:.5 blue:rand()%100 / 100. alpha:.4];
+    ofxPrimitiveNode *sphere = [[ofxPrimitiveNode alloc]initWith3dPrimitive:new ofSpherePrimitive(2,20) fillColor:nil];
     
-    [scene addChild:sphere];
+    sphere.wireFrameColor = [UIColor colorWithRed:1. green:.5 blue:rand()%100 / 100. alpha:.8];
+    sphere.fillColor = [UIColor colorWithRed:0. green:1. blue:rand()%100 / 100. alpha:.4];
+    [pivot addChild:sphere];
     
+    float dur = rand()%1000/1000.;
 
-    [sphere runAction:[NodeAction group:@[[NodeAction move3dBy:ofVec3f(rand()%2000 - 1000, rand()%2000 - 1000, rand()%1000+500) duration:rand()%1000/1000.],
-                                          [NodeAction rotateYByAngle:90 duration:1.]
+    [sphere runAction:[NodeAction group:@[[NodeAction move3dBy:ofVec3f(rand()%2000 - 1000, rand()%2000 - 1000, rand()%1000+500) duration:dur],
+                                          [NodeAction rotateYByAngle:90 duration:1.],
+                                          [NodeAction scaleBy:100. duration:dur]
                                           ]
                                         ]
                                         completion:^{

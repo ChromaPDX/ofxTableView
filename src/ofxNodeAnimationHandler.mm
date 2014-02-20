@@ -346,6 +346,30 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
     
 }
 
+#pragma mark - SCALE
+
++(NodeAction *)scaleBy:(CGFloat)scale duration:(NSTimeInterval)sec {
+    
+    NodeAction * action = [[NodeAction alloc] initWithDuration:sec];
+    
+    action.actionBlock = (ActionBlock)^(ofNode *node, float completion){
+        
+        if (action.reset) {
+            action.reset = false;
+            action.startPos = node->getScale();
+            action.endPos = ofPoint(action.startPos.x * scale, action.startPos.y * scale, action.startPos.z * scale);
+        }
+        
+      
+        action.node->setScale(getTweenPoint(action.startPos, action.endPos, completion));
+        
+    };
+    
+    return action;
+    
+}
+
+
 #pragma mark - CUSTOM ACTIONS
 
 +(NodeAction*)customActionWithDuration:(NSTimeInterval)seconds actionBlock:(void (^)(ofNode *, CGFloat))block {

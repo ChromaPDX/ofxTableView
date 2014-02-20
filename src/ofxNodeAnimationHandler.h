@@ -69,6 +69,7 @@ typedef void (^ActionBlock)(ofNode *node, float completion);
 @property (nonatomic) ofQuaternion startOrientation;
 @property (nonatomic) ofQuaternion endOrientation;
 
+
 @property (nonatomic) bool reset;
 
 
@@ -109,7 +110,7 @@ typedef void (^ActionBlock)(ofNode *node, float completion);
 //+ (NodeAction *)resizeToWidth:(CGFloat)width duration:(NSTimeInterval)duration;
 //+ (NodeAction *)resizeToHeight:(CGFloat)height duration:(NSTimeInterval)duration;
 //
-//+ (NodeAction *)scaleBy:(CGFloat)scale duration:(NSTimeInterval)sec;
++ (NodeAction *)scaleBy:(CGFloat)scale duration:(NSTimeInterval)sec;
 //+ (NodeAction *)scaleXBy:(CGFloat)xScale y:(CGFloat)yScale duration:(NSTimeInterval)sec;
 //+ (NodeAction *)scaleTo:(CGFloat)scale duration:(NSTimeInterval)sec;
 //+ (NodeAction *)scaleXTo:(CGFloat)xScale y:(CGFloat)yScale duration:(NSTimeInterval)sec;

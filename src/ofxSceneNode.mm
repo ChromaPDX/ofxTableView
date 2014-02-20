@@ -47,7 +47,9 @@
         
         // I AM ROOT DO SOME CONFIG
         ofEnableDepthTest();
-        //ofEnableAlphaBlending();
+        ofEnableAlphaBlending();
+        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
        // ofEnableBlendMode(OF_BLENDMODE_ADD);
         
         ofClear(ofColorWithUIColor(_backgroundColor));

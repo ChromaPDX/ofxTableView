@@ -129,7 +129,7 @@
 
 
 -(void)begin {
-   ofPushMatrix();
+    ofPushMatrix();
     ofMultMatrix(self.node->getLocalTransformMatrix());
    
     for (ofxNode *child in children) {
@@ -155,9 +155,7 @@
 }
 
 -(void)end {
-    
 
-    
     ofPopMatrix();
 }
 
