@@ -6,8 +6,7 @@
 //
 //
 
-#import "ofxSpriteNode.h"
-#import "ofxNodeAnimationHandler.h"
+#import "ofxNodeKit.h"
 
 @implementation ofxSpriteNode
 
@@ -33,10 +32,10 @@
 
 - (instancetype)initWithTexture:(ofTexture)texture color:(ofColor)color size:(CGSize)size {
     self = [super init];
+    
     if (self) {
         _texture = texture;
-        animationHandler = [[NodeAnimationHandler alloc] init];
-        _size = size;
+        self.size = size;
         _color = color;
     }
     return self;

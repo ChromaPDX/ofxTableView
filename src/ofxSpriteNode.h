@@ -33,6 +33,5 @@
 @property (nonatomic) float colorBlendFactor;
 @property (nonatomic) ofColor color;
 @property (nonatomic) ofPoint anchorPoint;
-@property (nonatomic) CGSize size;
 
 @end

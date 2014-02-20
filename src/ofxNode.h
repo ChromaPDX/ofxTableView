@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "ofMain.h"
 
-
 @class NodeAction;
 @class NodeAnimationHandler;
 @class ofxSceneNode;
@@ -25,26 +24,25 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 @interface ofxNode : NSObject
 {
     NSMutableArray *children;
-    
+    NSMutableSet *touches;
     // of internals
-    ofNode node;
+
     ofFbo *fbo;
-    int debugUI;
     bool dirty;
     
     NodeAnimationHandler *animationHandler;
     
 }
 
-@property (nonatomic) ofBlendMode blendMode;
+@property (nonatomic) ofNode *node;
 
+
+- (instancetype) init;
 - (void)updateWithTimeSinceLast:(NSTimeInterval) dt;
 - (void)draw;
 
-// SCENE
 
-
-
+@property (nonatomic) ofBlendMode blendMode;
 // WISH LIST TO FOLLOW
 
 ///**
@@ -74,7 +72,7 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 // The children of this node.
 // 
 // */
-@property (nonatomic, readonly) NSArray *children;
+//@property (nonatomic, readonly) NSArray *children;
 //
 //
 ///**
@@ -118,6 +116,17 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 - (void)removeAllChildren;
 //
 - (void)removeFromParent;
+
+
+// ofNode Position / Rotation
+
+- (void)setPosition:(CGPoint)position;
+- (void)set3dPosition:(ofPoint)position;
+
+- (CGPoint)getPosition;
+- (ofPoint)get3dPosition;
+
+
 //
 //- (ofxNode *)childNodeWithName:(NSString *)name;
 //- (void)enumerateChildNodesWithName:(NSString *)name usingBlock:(void (^)(ofxNode *node, BOOL *stop))block;
@@ -146,6 +155,26 @@ static inline ofColor ofColorWithUIColor(UIColor* color){
 ///* Returns true if the bounds of this node intersects with the transformed bounds of the other node, otherwise false */
 //
 //- (BOOL)intersectsNode:(ofxNode *)node;
+
+#pragma mark - GEOMETRTY
+
+-(bool)containsPoint:(CGPoint) location;
+
+@property (nonatomic) CGSize size;
+@property (nonatomic) CGPoint anchorPoint;
+
+-(ofRectangle)getDrawFrame;
+
+#pragma mark - TOUCH
+
+-(bool) touchDown:(CGPoint)location id:(int) touchId;
+-(bool) touchMoved:(CGPoint)location id:(int) touchId;
+-(bool) touchUp:(CGPoint)location id:(int) touchId;
+
+
+// UTIL
+
+-(void)logCoords;
 
 @end
 

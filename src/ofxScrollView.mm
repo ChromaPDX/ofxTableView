@@ -375,8 +375,6 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     
     NSLog(@"Starting Animation");
     
-    logFrame(action.destFrame);
-    logFrame(action2.destFrame);
     
 }
 

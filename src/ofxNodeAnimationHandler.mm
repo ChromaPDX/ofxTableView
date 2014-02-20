@@ -339,7 +339,6 @@ static inline ofPoint getTweenPoint(ofPoint src, ofPoint dst, float d){
         
         _node = node;
         actions = [[NSMutableArray alloc]init];
-        
     }
     
     return self;

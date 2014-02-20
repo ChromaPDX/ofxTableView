@@ -19,9 +19,11 @@
 		53F323EB10A20EDB00E0DAE4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F323EA10A20EDB00E0DAE4 /* OpenAL.framework */; };
 		6136B14418B2ECD700ED43AC /* ofxSceneNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */; };
 		6136B14718B2ECE300ED43AC /* ofxNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6136B14618B2ECE300ED43AC /* ofxNode.mm */; };
+		6136B14A18B409A100ED43AC /* ofxScrollNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6136B14918B409A100ED43AC /* ofxScrollNode.mm */; };
 		613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */; };
 		61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61860D9318984BC400CFEE44 /* ucontainer.cpp */; };
 		618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */; };
+		61F0E70E18B4249D008F6C97 /* nodeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 61F0E70C18B4249D008F6C97 /* nodeTest.mm */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
 		678E130A17951536005B6D19 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130917951536005B6D19 /* Icon.png */; };
 		678E130C1795153C005B6D19 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130B1795153C005B6D19 /* Default.png */; };
@@ -77,6 +79,8 @@
 		6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxSceneNode.mm; sourceTree = "<group>"; };
 		6136B14518B2ECE300ED43AC /* ofxNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNode.h; sourceTree = "<group>"; };
 		6136B14618B2ECE300ED43AC /* ofxNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxNode.mm; sourceTree = "<group>"; };
+		6136B14818B409A100ED43AC /* ofxScrollNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxScrollNode.h; sourceTree = "<group>"; };
+		6136B14918B409A100ED43AC /* ofxScrollNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxScrollNode.mm; sourceTree = "<group>"; };
 		613C648418AAF4CA0067D312 /* ofxNodeAnimationHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxNodeAnimationHandler.mm; sourceTree = "<group>"; };
 		613C648518AAF4CA0067D312 /* ofxNodeAnimationHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNodeAnimationHandler.h; sourceTree = "<group>"; };
 		61860D9218984BC400CFEE44 /* ofxTableViewNSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTableViewNSUtils.h; sourceTree = "<group>"; };
@@ -84,6 +88,9 @@
 		61860D9418984BC400CFEE44 /* ucontainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ucontainer.h; sourceTree = "<group>"; };
 		618DABBD18ADA16A001009CA /* ofxSpriteNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxSpriteNode.h; sourceTree = "<group>"; };
 		618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxSpriteNode.mm; sourceTree = "<group>"; };
+		61F0E70B18B41CBA008F6C97 /* ofxNodeKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxNodeKit.h; sourceTree = "<group>"; };
+		61F0E70C18B4249D008F6C97 /* nodeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nodeTest.mm; sourceTree = "<group>"; };
+		61F0E70D18B4249D008F6C97 /* nodeTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nodeTest.h; sourceTree = "<group>"; };
 		678E130717951530005B6D19 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "bin/data/Icon@2x.png"; sourceTree = "<group>"; };
 		678E130917951536005B6D19 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = bin/data/Icon.png; sourceTree = "<group>"; };
 		678E130B1795153C005B6D19 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = bin/data/Default.png; sourceTree = "<group>"; };
@@ -167,10 +174,13 @@
 				29B39F041894C57C00814331 /* ofxTableViewController.mm */,
 				6136B14218B2ECD700ED43AC /* ofxSceneNode.h */,
 				6136B14318B2ECD700ED43AC /* ofxSceneNode.mm */,
+				61F0E70B18B41CBA008F6C97 /* ofxNodeKit.h */,
 				6136B14518B2ECE300ED43AC /* ofxNode.h */,
 				6136B14618B2ECE300ED43AC /* ofxNode.mm */,
 				618DABBD18ADA16A001009CA /* ofxSpriteNode.h */,
 				618DABBE18ADA16A001009CA /* ofxSpriteNode.mm */,
+				6136B14818B409A100ED43AC /* ofxScrollNode.h */,
+				6136B14918B409A100ED43AC /* ofxScrollNode.mm */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -279,6 +289,8 @@
 			isa = PBXGroup;
 			children = (
 				E4D8936B11527B74007E1F53 /* main.mm */,
+				61F0E70D18B4249D008F6C97 /* nodeTest.h */,
+				61F0E70C18B4249D008F6C97 /* nodeTest.mm */,
 				E4D8936D11527B74007E1F53 /* testApp.mm */,
 				E4D8936C11527B74007E1F53 /* testApp.h */,
 			);
@@ -393,6 +405,7 @@
 			files = (
 				29B39F151894C57C00814331 /* ofxScrollView.mm in Sources */,
 				618DABBF18ADA16A001009CA /* ofxSpriteNode.mm in Sources */,
+				6136B14A18B409A100ED43AC /* ofxScrollNode.mm in Sources */,
 				E4D8936E11527B74007E1F53 /* main.mm in Sources */,
 				29B39F171894C57C00814331 /* ofxTableViewCell.mm in Sources */,
 				29B39F161894C57C00814331 /* ofxTableView.mm in Sources */,
@@ -401,6 +414,7 @@
 				6136B14718B2ECE300ED43AC /* ofxNode.mm in Sources */,
 				104880F75437BBEC8B04A578 /* ofxMultiTouch.cpp in Sources */,
 				613C648618AAF4CA0067D312 /* ofxNodeAnimationHandler.mm in Sources */,
+				61F0E70E18B4249D008F6C97 /* nodeTest.mm in Sources */,
 				6136B14418B2ECD700ED43AC /* ofxSceneNode.mm in Sources */,
 				61860D9518984BC400CFEE44 /* ucontainer.cpp in Sources */,
 			);
@@ -426,6 +440,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ofxiOS_Prefix.pch;
 				INFOPLIST_FILE = "ofxiOS-Info.plist";
@@ -449,6 +464,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ofxiOS_Prefix.pch;
 				INFOPLIST_FILE = "ofxiOS-Info.plist";

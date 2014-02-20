@@ -1,5 +1,5 @@
 #include "testApp.h"
-#import "ofxSpriteNode.h"
+
 
 // HERE IS AN EXAMPLE SUBCLASS OF A TABLE VIEW CELL
 
@@ -38,6 +38,7 @@ public:
 };
 
 //--------------------------------------------------------------
+
 void testApp::setup(){
     
     // INIT VIEW CONTROLLER, HANDLES TOUCHES
@@ -162,11 +163,6 @@ void testApp::setup(){
         
     }
     
-    
-    testSprite = [[ofxSpriteNode alloc] initWithImageNamed:@"Icon@2x.png"];
-    [testSprite runAction:[NodeAction rotateByAngle:20 duration:.3]];
-    
-    
 }
 
 void testApp::cellWasSelected(ofxTableViewCell *cell){
@@ -191,6 +187,7 @@ void testApp::update(){
     
     
     vc->update();
+
     
 }
 
@@ -213,17 +210,14 @@ void testApp::exit(){
 
 //--------------------------------------------------------------
 void testApp::touchDown(ofTouchEventArgs & touch){
-    
 }
 
 //--------------------------------------------------------------
 void testApp::touchMoved(ofTouchEventArgs & touch){
-    
 }
 
 //--------------------------------------------------------------
 void testApp::touchUp(ofTouchEventArgs & touch){
-    
 }
 
 //--------------------------------------------------------------

@@ -3,11 +3,11 @@
 #include "ofMain.h"
 #include "ofxiOS.h"
 #include "ofxiOSExtras.h"
-#include "ofxTableView.h"
+#import "ofxNodeKit.h"
 
-class testApp : public ofxiOSApp, ofxTableViewDelegate{
+class nodeTest : public ofxiOSApp {
     
-    public:
+public:
     
     // OF CORE
     
@@ -26,20 +26,16 @@ class testApp : public ofxiOSApp, ofxTableViewDelegate{
     void gotFocus();
     void gotMemoryWarning();
     void deviceOrientationChanged(int newOrientation);
-
+    
     // EXAMPLE VARS
-    
-    ofxTableViewController *vc;
-    ofxTableView *tbv;
-    ofxTableView *modalTable;
-    
+
     float rot;
     float spin;
     int dir;
     
-    // TABLE VIEW DELEGATE
+    NSTimeInterval lastTime;
     
-    void cellWasSelected(ofxTableViewCell *cell);
+    ofxSceneNode *scene;
     
 };
 
