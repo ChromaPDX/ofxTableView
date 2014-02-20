@@ -6,95 +6,8 @@
 
 #include <Foundation/Foundation.h>
 
-@implementation ScrollViewAction
-
-static inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
-    
-    return frame3d(weightedAverage(src.x, dst.x, d),
-                   weightedAverage(src.y, dst.y, d),
-                   weightedAverage(src.z, dst.z, d),
-                   weightedAverage(src.w, dst.w, d),
-                   weightedAverage(src.h, dst.h, d));
-    
-}
-
-+(ScrollViewAction*)TransitionWithStyle:(TransitionStyle) style Duration:(NSTimeInterval)duration {
-    
-    ScrollViewAction* action = [[ScrollViewAction alloc] init];
-    
-    action.style = style;
-    action.duration = duration;
-    
-    action.actionBlock = (ActionBlock)^(ofNode* node, float completion){
-        
-        //NSLog(@"start of block");
-        
-        switch (action.style) {
-                
-            case TransitionStyleNone:
-                
-                break;
-                
-            case TransitionStyleEnterFromRight: case TransitionStyleEnterFromLeft: case TransitionStyleExitToLeft: case TransitionStyleExitToRight:
-                
-                ((ofxScrollView*)action.node)->setFrame(getTweenFrame(action.sourceFrame, action.destFrame, completion));
-                
-                break;
-                
-            case TransitionStyleZoomIn: case TransitionStyleZoomOut:
-                
-                ((ofxScrollView*)action.node)->setFrame(getTweenFrame(action.sourceFrame, action.destFrame, completion));
-                
-                break;
-                
-            case TransitionStyleFade:
-                ((ofxScrollView*)action.node)->alpha = weightedAverage(action.srcAlpha, action.dstAlpha, completion);
-                
-            default:
-                break;
-        }
-        
-        if (completion == 1){
-            
-            ((ofxScrollView*)action.node)->setFrame(action.destFrame);
-            
-            if (action.style == TransitionStyleExitToLeft || action.style == TransitionStyleExitToRight || action.style == TransitionStyleZoomIn) {
-                ((ofxScrollView*)action.node)->hidden = true;
-            }
-            
-            if (action.style == TransitionStyleEnterFromLeft || action.style == TransitionStyleEnterFromRight || action.style == TransitionStyleZoomOut) {
-                if (((ofxScrollView*)action.node)->_modalChild) {
-                    
-                    ((ofxScrollView*)action.node)->_modalChild->setOrientation(((ofxScrollView*)action.node)->_modalChild->cachedOrientation);
-                    ((ofxScrollView*)action.node)->_modalChild->setParent(((ofxScrollView*)action.node)->_modalChild->_parent);
-                    
-                    ((ofxScrollView*)action.node)->_modalChild->_modalParent = NULL;
-                    ((ofxScrollView*)action.node)->_modalChild = NULL;
-                    
-                }
-            }
-            
-            NSLog(@"animation compelted after %f seconds", action.progress);
-            
-            NSLog(@"end of block");
-            
-            
-        }
-
-        
-    };
-    
-    NSLog(@"create trans action");
-    return action;
-    
-}
-
-
-@end
-
 ofxScrollView:: ofxScrollView()//constructor
 {
-    animationHandler = [[NodeAnimationHandler alloc] initWithNode:this];
 }
 
 ofxScrollView::~ ofxScrollView()//destructor
@@ -110,13 +23,12 @@ ofxScrollView::~ ofxScrollView()//destructor
 void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
     
     setFrame(frame);
-    
     if (parent){
         
         setParent(parent);
         
-        horizontalPadding = 20;
-        verticalPadding = 0;
+        horizontalPadding = 200;
+        verticalPadding = 300;
         
         setFgColor(parent->fgColor);
         
@@ -124,7 +36,7 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
         sharedFont = parent->sharedFont;
         
         parent->cdirty = true;
-        
+
         ofNode *recur2 = this;
         
         int nump = 0;
@@ -135,7 +47,7 @@ void ofxScrollView::initWithParent(ofxScrollView *parent, frame3d frame){
             
             nump++;
         }
-        
+
         NSLog(@"node level: %d", nump);
         
     }
@@ -177,13 +89,13 @@ void ofxScrollView::addChild(ofxScrollView *child){
     
     if (!hasChild(child)) {
         
-        child->referenceId = children.size();
-        child->displayId = child->referenceId;
-        child->hidden = false;
+    child->referenceId = children.size();
+    child->displayId = child->referenceId;
+    child->hidden = false;
         
-        cdirty = true;
-        
-        children.push_back(child);
+    cdirty = true;
+    
+    children.push_back(child);
         
     }
     
@@ -226,17 +138,17 @@ void ofxScrollView::removeChild(ofxScrollView* child){
         }
     }
     
-    
+
 }
 
 bool ofxScrollView::hasChild(ofxScrollView* child){
     
-    
+
     vector<ofxScrollView*>::iterator it;
     
     for ( it = children.begin(); it != children.end(); ){
         if( (*it)==child ){
-            // it = children.erase(it);
+           // it = children.erase(it);
             return true;
         }
         else {
@@ -299,21 +211,32 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
     
     child->_modalParent = this;
     child->cachedOrientation = ofQuaternion(child->getOrientationQuat());
-    
+
     // Create My Transition Object
     
-    ScrollViewAction *action = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
+    ofxScrollViewAnimation* currentAnimation = new ofxScrollViewAnimation;
     
-    action.sourceFrame = getFrame();
+    currentAnimation->completed = false;
+    currentAnimation->completion = 0.0f;
+    currentAnimation->duration = durationSec * 1000;
+    currentAnimation->startTime = ofGetElapsedTimeMillis();
+    currentAnimation->style = style;
+    currentAnimation->sourceFrame = getFrame();
+    
     
     // Create Child Transition Object
     
-    ScrollViewAction *action2 = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
+    ofxScrollViewAnimation* childAnimation = new ofxScrollViewAnimation;
     
-    action2.destFrame = getFrame();
+    childAnimation->completed = false;
+    childAnimation->completion = 0.0f;
+    childAnimation->duration = durationSec * 1000;
+    childAnimation->startTime = ofGetElapsedTimeMillis();
+    childAnimation->style = style;
     
     child->hidden = false;
     
+    childAnimation->destFrame = getFrame();
     
     switch (style) {
             
@@ -323,42 +246,39 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             
         case TransitionStyleExitToLeft:
             
-            action2.sourceFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
+            childAnimation->sourceFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
             
-            action.destFrame = frame3d(myFrame.x-myFrame.w, myFrame.y,getZ(), myFrame.w, myFrame.h);
-            
-            action2.style = TransitionStyleEnterFromRight;
-            
+            currentAnimation->destFrame = frame3d(myFrame.x-myFrame.w, myFrame.y,getZ(), myFrame.w, myFrame.h);
+            childAnimation->style = TransitionStyleEnterFromRight;
             
             
             child->hidden = false;
-            
+
             break;
             
         case TransitionStyleExitToRight:
             
+            childAnimation->sourceFrame = frame3d(myFrame.x-myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
             
-            action2.sourceFrame = frame3d(myFrame.x-myFrame.w, myFrame.y, 0, myFrame.w, myFrame.h);
-            
-            action.destFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, getZ(), myFrame.w, myFrame.h);
-            action2.style = TransitionStyleEnterFromLeft;
-            
-            
+            currentAnimation->destFrame = frame3d(myFrame.x+myFrame.w, myFrame.y, getZ(), myFrame.w, myFrame.h);
+            childAnimation->style = TransitionStyleEnterFromLeft;
+
             break;
             
         case TransitionStyleZoomIn:
             
             child->hidden = false;
             
-            action2.sourceFrame = frame3d(child->getGlobalPosition(), child->getFrame().getSize());
+            childAnimation->sourceFrame = child->_parent->getGlobalFrame();
             
-            //logFrame(child->getGlobalFrame());
+            logFrame(child->getGlobalFrame());
             
-            _modalChild->cachedFrame = action2.sourceFrame;
+            _modalChild->cachedFrame = childAnimation->sourceFrame;
             
-            action.destFrame = frame3d(getX(), getY(), getZ()+1000, myFrame.w,myFrame.h);
+            currentAnimation->destFrame = frame3d(getX(), getY(), getZ()+1000, myFrame.w,myFrame.h);
             
-            action2.style = TransitionStyleZoomOut;
+            childAnimation->style = TransitionStyleZoomOut;
+            
             
             break;
             
@@ -368,12 +288,12 @@ void ofxScrollView::pushModalView(ofxScrollView *child, TransitionStyle style, f
             break;
     }
     
-    child->clearParent();
+//    NSLog(@"Starting Animation");
+//    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+//    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
     
-    [animationHandler runAction:action];
-    [child->animationHandler runAction:action2];
-    
-    NSLog(@"Starting Animation");
+    animations.push_back(currentAnimation);
+    child->animations.push_back(childAnimation);
     
     
 }
@@ -386,18 +306,26 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
     
     // Create My Transition Object
     
-    ScrollViewAction *action = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
+    ofxScrollViewAnimation* currentAnimation = new ofxScrollViewAnimation;
     
-    action.sourceFrame = getFrame();
+    currentAnimation->completed = false;
+    currentAnimation->completion = 0.0f;
+    currentAnimation->duration = durationSec * 1000;
+    currentAnimation->startTime = ofGetElapsedTimeMillis();
+    currentAnimation->style = style;
+    currentAnimation->sourceFrame = getFrame();
     
     
     // Create Child Transition Object
     
-    ScrollViewAction *action2 = [ScrollViewAction TransitionWithStyle:style Duration:durationSec*1000];
+    ofxScrollViewAnimation* childAnimation = new ofxScrollViewAnimation;
     
-    action2.sourceFrame = child->getFrame();
-    
-    child->hidden = false;
+    childAnimation->completed = false;
+    childAnimation->completion = 0.0f;
+    childAnimation->duration = durationSec * 1000;
+    childAnimation->startTime = ofGetElapsedTimeMillis();
+    childAnimation->style = style;
+    childAnimation->sourceFrame = child->getFrame();
     
     switch (style) {
         case TransitionStyleNone:
@@ -406,12 +334,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromLeft:
             
-            action.destFrame = frame3d(getX()+myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
+            currentAnimation->destFrame = frame3d(getX()+myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
             
+            childAnimation->style = TransitionStyleExitToRight;
             
-            action2.style = TransitionStyleExitToRight;
-            
-            action2.destFrame = frame3d(child->getX()+child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
+            childAnimation->destFrame = frame3d(child->getX()+child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
             
@@ -419,11 +346,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
         case TransitionStyleEnterFromRight:
             
-            action.destFrame = frame3d(getX()-myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
+            currentAnimation->destFrame = frame3d(getX()-myFrame.w, getY(), getZ(), myFrame.w, myFrame.h);
             
-            action2.style = TransitionStyleExitToLeft;
+            childAnimation->style = TransitionStyleExitToLeft;
             
-            action2.destFrame = frame3d(child->getX()-child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
+            childAnimation->destFrame = frame3d(child->getX()-child->getWidth(), child->getY(), child->getZ(), child->getWidth(), child->getHeight());
             
             hidden=false;
             
@@ -435,11 +362,11 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             
             //_modalChild->cachedFrame = _modalChild->getFrame();
             
-            action.destFrame = frame3d(getX(), getY(), 0, myFrame.w,myFrame.h);
+            currentAnimation->destFrame = frame3d(getX(), getY(), 0, myFrame.w,myFrame.h);
             
-            action2.destFrame = _modalChild->cachedFrame;
+            childAnimation->destFrame = _modalChild->cachedFrame;
             
-            action2.style = TransitionStyleEnterFromLeft;
+            childAnimation->style = TransitionStyleEnterFromLeft;
             
             break;
             
@@ -447,14 +374,118 @@ void ofxScrollView::popModalView(TransitionStyle style,float durationSec){
             break;
     }
     
-    [animationHandler runAction:action];
-    [child->animationHandler runAction:action2];
+    if (animations.size()) {
+        currentAnimation->sourceFrame = animations[animations.size()-1]->destFrame;
+    }
+    if (child->animations.size()) {
+        childAnimation->sourceFrame = child->animations[child->animations.size()-1]->destFrame;
+    }
     
-    NSLog(@"Starting Animation");
+//    NSLog(@"Starting Animation");
+//    NSLog(@"target myFrame: %f %f %f %f", currentAnimation->destFrame.x, currentAnimation->destFrame.y,currentAnimation->destFrame.w,currentAnimation->destFrame.h);
+//    NSLog(@"child target myFrame: %f %f %f %f", childAnimation->destFrame.x, childAnimation->destFrame.y,childAnimation->destFrame.w,childAnimation->destFrame.h);
+    
+    animations.push_back(currentAnimation);
+    child->animations.push_back(childAnimation);
+    
 }
 
 
+inline float weightedAverage (float src, float dst, float d){
+    
+    return src == dst ? src : ((src * (1.-d) + dst * d));
+    
+}
 
+inline float logAverage (float src, float dst, float d){
+    
+    return src == dst ? src : ((src * (1.- d*d) + dst * d * d));
+    
+}
+
+inline frame3d getTweenFrame(frame3d src, frame3d dst, float d){
+    
+    return frame3d(weightedAverage(src.x, dst.x, d),
+                       weightedAverage(src.y, dst.y, d),
+                       weightedAverage(src.z, dst.z, d),
+                       weightedAverage(src.w, dst.w, d),
+                       weightedAverage(src.h, dst.h, d));
+    
+}
+
+void ofxScrollView::updateAnimation(ofxScrollViewAnimation *anim) {
+    
+    
+    anim->completion = ((float)(ofGetElapsedTimeMillis() - anim->startTime) / (anim->duration));
+    
+    //NSLog(@"update %f completion", anim->completion);
+    
+    switch (anim->style) {
+            
+        case TransitionStyleNone:
+            
+            break;
+            
+        case TransitionStyleEnterFromRight: case TransitionStyleEnterFromLeft: case TransitionStyleExitToLeft: case TransitionStyleExitToRight:
+            
+            setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
+            
+            break;
+            
+        case TransitionStyleZoomIn: case TransitionStyleZoomOut:
+            
+            setFrame(getTweenFrame(anim->sourceFrame, anim->destFrame, anim->completion));
+            
+            break;
+            
+        case TransitionStyleFade:
+            alpha = weightedAverage(anim->srcAlpha, anim->dstAlpha, anim->completion);
+            
+        default:
+            break;
+    }
+    
+    if (anim->completion >= 1.){
+        
+        setFrame(anim->destFrame);
+        
+        if (anim->style == TransitionStyleExitToLeft || anim->style == TransitionStyleExitToRight || anim->style == TransitionStyleZoomIn) {
+            hidden = true;
+        }
+        
+        if (anim->style == TransitionStyleEnterFromLeft || anim->style == TransitionStyleEnterFromRight || anim->style == TransitionStyleZoomOut) {
+            if (_modalChild) {
+                
+                _modalChild->setOrientation(_modalChild->cachedOrientation);
+                
+                //_modalChild->hidden = true;
+                
+                _modalChild->setParent(_modalChild->_parent);
+                
+                _modalChild->_modalParent = NULL;
+                _modalChild = NULL;
+                
+                
+                
+            }
+        }
+        
+        delete anim;
+        
+        animations.erase(animations.begin());
+        
+        NSLog(@"animation compelted after %llu seconds", (ofGetElapsedTimeMillis() - anim->startTime));
+        
+//        if (_modalChild) {
+//                 popModalView(TransitionStyleEnterFromLeft, 1.);
+//        }
+        
+        
+    }
+    
+
+    
+}
 
 
 
@@ -530,13 +561,9 @@ void ofxScrollView::update() {
         
     }
     
-    double time = ofGetElapsedTimeMillis();
-    
-    if (lastTime != 0) {
-    [animationHandler updateWithTimeSinceLast:time - lastTime];
+    if (animations.size()) {
+        updateAnimation(animations[0]);
     }
-    
-    lastTime = time;
     
     for(int i = 0; i < children.size(); i++)
     {
@@ -551,14 +578,16 @@ void ofxScrollView::update() {
 #pragma mark - ofx DRAW
 
 void ofxScrollView::begin() {
-    
+    ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+
+   
     if  (debugUI){
         ofSetColor(255,0,0,255);
         ofDrawSphere(getPosition(), 10);
     }
-    
+
     if (!parent) {
-        
+    
         // I AM ROOT DO SOME CONFIG
         ofEnableDepthTest();
         ofEnableAlphaBlending();
@@ -569,13 +598,14 @@ void ofxScrollView::begin() {
     {
         
         ofRectangle d = getDrawFrame();
-        
+
         if (shouldRasterize){
             
             if (!raster.isAllocated()) {
                 raster.allocate(myFrame.w, myFrame.h);
             }
             raster.begin();
+           // ofClear(0,0,0,255);
             
         }
         
@@ -603,7 +633,7 @@ void ofxScrollView::begin() {
             
         }
         
-        
+
         
         
         
@@ -617,29 +647,32 @@ void ofxScrollView::begin() {
 void     ofxScrollView::draw()
 {
     
-    /*
+  //  ofLog(OF_LOG_NOTICE, "in ofxScrollView::draw");
+/*
      // SUBCLASS LOOKS LIKE
      
      if (!hidden) {
      
      ofxScrollView::begin();
+
      
      // CUSTOM DRAW CODE
      
      ofxScrollView::end();
      
      }
-     */
+    */
     
 }
 
 void ofxScrollView::end() {
     
-    
+   
     
     if (!hidden && (!shouldRasterize || (shouldRasterize && dirty)))
     {
         
+       // NSLog(@"in ofxScrollView::end()");
         ofRectangle d = getDrawFrame();
         
         for(int i = 0; i < children.size(); i++)
@@ -647,11 +680,12 @@ void ofxScrollView::end() {
             
             setChildFrame(children[i]);
             if (!children[i]->hidden) {
-                children[i]->draw();
+                    children[i]->draw();
             }
             
             
         }
+        
         
         if (drawsBorder) {
             ofNoFill();
@@ -663,16 +697,7 @@ void ofxScrollView::end() {
         }
         
         
-        if (shouldRasterize) {
-            
-            raster.end();
-            
-            ofPushMatrix();
-            ofMultMatrix( getLocalTransformMatrix() );
-            
-            raster.draw(d.x, d.y);
-            
-        }
+    
         
         
         
@@ -682,6 +707,23 @@ void ofxScrollView::end() {
             ofSetColor(255,255,255,100);
             ofRect(d);
             ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        }
+        else{
+            ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        }
+        
+        if (shouldRasterize) {
+           // setBgColor(ofColor(random()%255,random()%255,random()%255,200 ));
+            raster.end();
+            
+           // ofPushMatrix();
+           // ofMultMatrix( getLocalTransformMatrix() );
+            
+            //raster.draw(d.x, d.y);
+            raster.draw(0,0);
+          //  ofPopMatrix();
+
+
         }
         
         dirty = false;
@@ -706,7 +748,6 @@ float ofxScrollView::getScreenScale(){
 }
 
 float ofxScrollView::outOfBounds(){
-    
     if (scrollDirectionVertical) {
         
         if (scrollPosition > verticalPadding) {
@@ -770,6 +811,9 @@ float ofxScrollView::outOfBounds(){
 }
 
 bool ofxScrollView::scrollShouldCull() {
+
+    
+    return false;  // temp workaround, this shoudl be fixed to avoid nodes popping on and off at edge of screen. -eric
     
     if (_parent){
         
@@ -784,7 +828,7 @@ bool ofxScrollView::scrollShouldCull() {
             else if (getX() + myFrame.w/2. < d.x || getX() - myFrame.w/2. > d.x + d.width) {
                 return true;
             }
-            
+
         }
         
     }
@@ -793,7 +837,7 @@ bool ofxScrollView::scrollShouldCull() {
 }
 
 ofVec3f ofxScrollView::getCenter(){
-    
+
     return ofVec3f(getX()-myFrame.w/2., getY()-myFrame.h/2., getZ());
     
 }
@@ -893,7 +937,7 @@ void ofxScrollView::setChildFrame(ofxScrollView *v){
         
         
         v->hidden = v->scrollShouldCull();
-        
+
         
     }
     
@@ -921,56 +965,53 @@ void ofxScrollView::setFrame(frame3d frame){
     if (myFrame.h != frame.h || myFrame.w != frame.w || getZ() != frame.z) { // SCALED, refresh content size
         cdirty = true;
     }
-
-    setPosition(frame.getPosition());
     
-    //NSLog(@"moving %f", frame.getPosition().x - myFrame.getPosition().x);
+    setPosition(frame.x, frame.y, frame.z);
     
     myFrame = frame;
     
     fdirty = true;
     
+    //setPosition(nmyFrame.x + nmyFrame.w/2., nmyFrame.y+nmyFrame.h/2, getZ());
 }
-
-
 
 
 void ofxScrollView::scaleFrame(float scale){
     
-    // setScale(scale, scale, scale);
+   // setScale(scale, scale, scale);
     
-    //    if (_scale != scale){
-    //
-    //        fdirty = true;
-    //        cdirty = true;
-    //
-    //        float dScale = (scale - _scale);
-    //
-    //        float rScale = 1 + dScale;
-    //
-    //        myFrame = ofRectangle(0,0,myFrame.w * rScale,myFrame.h * rScale);
-    //
-    //        setFrame(ofRectangle(myFrame.x, myFrame.y, myFrame.w, myFrame.h));
-    //
-    //        _xRootOffset = myFrame.x;
-    //        _yRootOffset = myFrame.y;
-    //
-    //        _scale += dScale;
-    //
-    //        raster.allocate(myFrame.w, myFrame.h);
-    //
-    //        NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
-    //
-    //    }
+//    if (_scale != scale){
+//        
+//        fdirty = true;
+//        cdirty = true;
+//        
+//        float dScale = (scale - _scale);
+//        
+//        float rScale = 1 + dScale;
+//        
+//        myFrame = ofRectangle(0,0,myFrame.w * rScale,myFrame.h * rScale);
+//        
+//        setFrame(ofRectangle(myFrame.x, myFrame.y, myFrame.w, myFrame.h));
+//        
+//        _xRootOffset = myFrame.x;
+//        _yRootOffset = myFrame.y;
+//        
+//        _scale += dScale;
+//        
+//        raster.allocate(myFrame.w, myFrame.h);
+//        
+//        NSLog(@"new: %f, delta : %f, scale %f",scale, dScale, _scale);
+//        
+//    }
     
 }
 
 ofRectangle     ofxScrollView::getWorldFrame(){
     
     ofPoint g = getGlobalPosition();
-    
+
     return ofRectangle(g.x - myFrame.w/2.,g.y-myFrame.h/2., myFrame.w, myFrame.h);
-    
+        
 }
 
 bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is within boundaries of object.
@@ -982,14 +1023,14 @@ bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is w
     float lx = x - ofGetWidth()/2.;
     
     float ly = y - ofGetHeight()/2.;
-    
-    // NSLog(@"contains point ? %f %f", lx, ly);
+
+   // NSLog(@"contains point ? %f %f", lx, ly);
     
     bool withinArea = false;
     if ( lx > d.x && lx < d.x + d.width && ly > d.y && ly < d.y + d.height)
     {
         
-        //   NSLog(@"in rect %f %f %f %f",d.x-myFrame.w/2.,d.y-myFrame.h/2., myFrame.w, myFrame.h);
+     //   NSLog(@"in rect %f %f %f %f",d.x-myFrame.w/2.,d.y-myFrame.h/2., myFrame.w, myFrame.h);
         withinArea = true;
     }
     return withinArea;
@@ -1000,21 +1041,21 @@ bool     ofxScrollView::containsPoint(int x, int y) //check to see if mouse is w
 void ofxScrollView::setHighlighted(bool setHighlighted) {
     
     //if (highlighted != setHighlighted) {
-    
-    if (children.size()) {
-        if (!setHighlighted) {
-            for (int i = 0; i < children.size(); i++ )
-            {
-                children[i]->setHighlighted(false);
+        
+        if (children.size()) {
+            if (!setHighlighted) {
+                for (int i = 0; i < children.size(); i++ )
+                {
+                    children[i]->setHighlighted(false);
+                }
             }
         }
-    }
-    
-    else {
-        highlighted = setHighlighted;
-    }
-    
-    // }
+        
+        else {
+            highlighted = setHighlighted;
+        }
+        
+   // }
     
 }
 
@@ -1098,7 +1139,7 @@ bool     ofxScrollView::touchDown(float x , float y, int touchId)
         
     }
     
-    
+
     
     return hit;
     
@@ -1186,7 +1227,7 @@ bool     ofxScrollView::touchMoved(float x, float y, int touchId)
                         hit = false;
                         
                     }
-                    
+         
                 }
             }
             
@@ -1208,14 +1249,14 @@ bool     ofxScrollView::touchMoved(float x, float y, int touchId)
         }
         
     }
-    
+
     return hit;
     
 }
 
 bool     ofxScrollView::touchUp(float x, float y, int touchId)
 {
-    
+    setHighlighted(false);
     bool hit = true;
     
     if (_modalChild){
@@ -1233,7 +1274,7 @@ bool     ofxScrollView::touchUp(float x, float y, int touchId)
             }
         }
     }
-    
+
     if (scrollingEnabled) {
         
         if (scrollPhase == ScrollPhaseFailed || scrollPhase == ScrollPhaseBegan || scrollPhase == ScrollPhaseNil) {
@@ -1303,14 +1344,8 @@ bool     ofxScrollView::touchUp(float x, float y, int touchId)
     }
     
     return hit;
-    
-    
 }
 
 bool ofxScrollView::touchDoubleTap(float x, float y, int touchId){
-    
     return 1;
-    
 }
-
-
